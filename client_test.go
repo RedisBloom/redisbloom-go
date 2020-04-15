@@ -1,4 +1,4 @@
-package redis_timeseries_go
+package redis_bloom_go
 
 import (
 	"os"
@@ -11,12 +11,12 @@ import (
 )
 
 func createClient() *Client {
-	valueh, exists := os.LookupEnv("REDISTIMESERIES_TEST_HOST")
+	valueh, exists := os.LookupEnv("REDISBLOOM_TEST_HOST")
 	host := "localhost:6379"
 	if exists && valueh != "" {
 		host = valueh
 	}
-	valuep, exists := os.LookupEnv("REDISTIMESERIES_TEST_PASSWORD")
+	valuep, exists := os.LookupEnv("REDISBLOOM_TEST_PASSWORD")
 	password := "SUPERSECRET"
 	var ptr *string = nil
 	if exists {
