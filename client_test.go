@@ -41,6 +41,26 @@ func (client *Client) FlushAll() (err error) {
 	return err
 }
 
+func TestReserve(t *testing.T) {
+	client.FlushAll()
+	key := "test_RESERVE"
+	err := client.Reserve(key, 0.1, 1000)
+	assert.Nil(t, err)
+	
+	info, err := client.Info(key)
+	assert.Nil(t, err)
+	assert.Equal(t, info, map[string]int64{
+			"Capacity": 1000,
+			"Expansion rate": 2,
+            "Number of filters": 1,
+            "Number of items inserted": 0,
+            "Size": 932,
+	})
+	
+	err = client.Reserve(key, 0.1, 1000)
+	assert.NotNil(t, err)
+}
+
 func TestAdd(t *testing.T) {
 	client.FlushAll()
 	key := "test_ADD"
@@ -48,6 +68,10 @@ func TestAdd(t *testing.T) {
 	exists, err := client.Add(key, value)
 	assert.Nil(t, err)
 	assert.True(t, exists)
+	
+	info, err := client.Info(key)
+	assert.Nil(t, err)
+	assert.NotNil(t, info)
 	
 	exists, err = client.Add(key, value)
 	assert.Nil(t, err)
