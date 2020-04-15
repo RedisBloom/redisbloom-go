@@ -58,21 +58,9 @@ func main() {
 
 | Command | Recommended API and godoc  |
 | :---          |  ----: |
-| [TS.CREATE](https://oss.redislabs.com/RedisBloom/commands/#tscreate) |   [CreateKeyWithOptions](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.CreateKeyWithOptions)          |
-| [TS.ALTER](https://oss.redislabs.com/RedisBloom/commands/#tsalter) |   N/A          |
-| [TS.ADD](https://oss.redislabs.com/RedisBloom/commands/#tsadd) |   <ul><li>[Add](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.Add)</li><li>[AddAutoTs](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.AddAutoTs)</li><li>[AddWithOptions](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.AddWithOptions)</li><li>[AddAutoTsWithOptions](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.AddWithOptions)</li> </ul>          |
-| [TS.MADD](https://oss.redislabs.com/RedisBloom/commands/#tsmadd) |    N/A |
-| [TS.INCRBY/TS.DECRBY](https://oss.redislabs.com/RedisBloom/commands/#tsincrbytsdecrby) |    N/A         |
-| [TS.CREATERULE](https://oss.redislabs.com/RedisBloom/commands/#tscreaterule) |   [CreateRule](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.CreateRule)          |
-| [TS.DELETERULE](https://oss.redislabs.com/RedisBloom/commands/#tsdeleterule) |   [DeleteRule](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.DeleteRule)          |
-| [TS.RANGE](https://oss.redislabs.com/RedisBloom/commands/#tsrange) |   [RangeWithOptions](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.RangeWithOptions)          |
-| [TS.MRANGE](https://oss.redislabs.com/RedisBloom/commands/#tsmrange) |   [MultiRangeWithOptions](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.MultiRangeWithOptions)          |
-| [TS.GET](https://oss.redislabs.com/RedisBloom/commands/#tsget) |   [Get](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.Get)          |
-| [TS.MGET](https://oss.redislabs.com/RedisBloom/commands/#tsmget) |   [MultiGet](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.MultiGet)          |
-| [TS.INFO](https://oss.redislabs.com/RedisBloom/commands/#tsinfo) |   [Info](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.Info)          |
-| [TS.QUERYINDEX](https://oss.redislabs.com/RedisBloom/commands/#tsqueryindex) |    N/A |
-
+| [BF.ADD](https://oss.redislabs.com/redisbloom/Bloom_Commands/#bfadd) |  |
+| [BF.EXISTS](https://oss.redislabs.com/redisbloom/Bloom_Commands/#bfexists) |  |
 
 ## License
 
-redisbloom-go is distributed under the Apache-2 license - see [LICENSE](LICENSE)
+redisbloom-go is distributed under the BSD 3-Clause license - see [LICENSE](LICENSE)
