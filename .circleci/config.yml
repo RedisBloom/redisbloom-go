@@ -9,6 +9,7 @@ jobs:
       - image: circleci/golang:1.12
 
       - image: redislabs/rebloom:edge
+        command: ['--requirepass', 'SUPERSECRET', '--loadmodule', '/usr/lib/redis/modules/redisbloom.so']
         port: 6379:6379
 
     working_directory: /go/src/github.com/RedisBloom/redisbloom-go
