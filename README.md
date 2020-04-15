@@ -44,6 +44,12 @@ func main() {
     if err != nil {
         fmt.Println("Error:", err)
     }
+    
+    exists, err = client.Exists("mytest", "myItem")
+    if err != nil {
+        fmt.Println("Error:", err)
+    }
+    fmt.Println("myItem exists in mytest: ", exists)
 }
 ```
 
