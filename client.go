@@ -1,4 +1,4 @@
-package redis_timeseries_go
+package redis_bloom_go
 
 import (
 	"strings"
