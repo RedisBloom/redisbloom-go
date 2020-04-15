@@ -1,0 +1,38 @@
+# Golang CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-go/ for more details
+version: 2
+jobs:
+  build:
+    docker:
+      # specify the version
+      - image: circleci/golang:1.12
+
+      - image: redislabs/rebloom:edge
+        port: 6379:6379
+
+    working_directory: /go/src/github.com/RedisBloom/redisbloom-go
+    steps:
+      - checkout
+      - run: go get -v -t -d ./...
+
+      #run tests with coverage
+      - run: go test -v -race -coverprofile=coverage.txt -covermode=atomic
+      - run: go tool cover -func=coverage.txt
+      - run: bash <(curl -s https://codecov.io/bash) -t ${CODECOV_TOKEN}
+
+workflows:
+  version: 2
+  commit:
+    jobs:
+      - build
+  nightly:
+    triggers:
+      - schedule:
+          cron: "0 0 * * *"
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - build
