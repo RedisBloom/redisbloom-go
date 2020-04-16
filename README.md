@@ -32,25 +32,24 @@ package main
 
 import (
         "fmt"
-        RedisBloom "github.com/RedisBloom/redisbloom-go"
+        redisbloom "github.com/RedisBloom/redisbloom-go"
 )
 
 func main() {
 		// Connect to localhost with no password
-        var client = RedisBloom.NewClient("localhost:6379", "nohelp", nil)
-        var keyname = "mytest"
-        _, haveit := client.Info(keyname)
-        if haveit != nil {
-			client.CreateKeyWithOptions(keyname, RedisBloom.DefaultCreateOptions)
-			client.CreateKeyWithOptions(keyname+"_avg", RedisBloom.DefaultCreateOptions)
-			client.CreateRule(keyname, RedisBloom.AvgAggregation, 60, keyname+"_avg")
-        }
-		// Add sample with timestamp from server time and value 100
-        // TS.ADD mytest * 100 
-        _, err := client.AddAutoTs(keyname, 100)
-        if err != nil {
-                fmt.Println("Error:", err)
-        }
+    var client = redisbloom.NewClient("localhost:6379", "nohelp", nil)
+       
+    // TS.ADD mytest item 
+    _, err := client.Add("mytest", "myItem")
+    if err != nil {
+        fmt.Println("Error:", err)
+    }
+    
+    exists, err = client.Exists("mytest", "myItem")
+    if err != nil {
+        fmt.Println("Error:", err)
+    }
+    fmt.Println("myItem exists in mytest: ", exists)
 }
 ```
 
