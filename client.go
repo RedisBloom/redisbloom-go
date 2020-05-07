@@ -35,6 +35,16 @@ func NewClient(addr, name string, authPass *string) *Client {
 	return ret
 }
 
+
+// NewClientFromPool creates a new Client with the given pool and client name
+func NewClientFromPool(pool *redis.Pool, name string) *Client {
+	ret := &Client{
+		Pool: pool,
+		Name: name,
+	}
+	return ret
+}
+
 // Reserve - Creates an empty Bloom Filter with a given desired error ratio and initial capacity. 
 // args:
 // key - the name of the filter

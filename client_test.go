@@ -2,30 +2,49 @@ package redis_bloom_go
 
 import (
 	"os"
-//	"reflect"
 	"testing"
 	"time"
-
-//	"github.com/gomodule/redigo/redis"
+	"github.com/gomodule/redigo/redis"
 	"github.com/stretchr/testify/assert"
 )
 
-func createClient() *Client {
-	valueh, exists := os.LookupEnv("REDISBLOOM_TEST_HOST")
+
+func getTestConnectionDetails() (string, string) {
+	value, exists := os.LookupEnv("REDISBLOOM_TEST_HOST")
 	host := "localhost:6379"
-	if exists && valueh != "" {
-		host = valueh
+	password := ""
+	valuePassword, existsPassword := os.LookupEnv("REDISBLOOM_TEST_PASSWORD")
+	if exists && value != "" {
+		host = value
 	}
-	valuep, exists := os.LookupEnv("REDISBLOOM_TEST_PASSWORD")
-	password := "SUPERSECRET"
+	if existsPassword && valuePassword != "" {
+		password = valuePassword
+	}
+	return host, password
+}
+
+func createClient() *Client {
+	host, password := getTestConnectionDetails()
 	var ptr *string = nil
-	if exists {
-		password = valuep
-	}
 	if len(password) > 0 {
 		ptr = &password
 	}
 	return NewClient(host, "test_client", ptr)
+}
+
+
+func TestNewClientFromPool(t *testing.T) {
+	host, password := getTestConnectionDetails()
+	pool := &redis.Pool{Dial: func() (redis.Conn, error) {
+		return redis.Dial("tcp", host, redis.DialPassword(password))
+	}, MaxIdle: maxConns}
+	client1 := NewClientFromPool(pool, "bloom-client-1")
+	client2 := NewClientFromPool(pool, "bloom-client-2")
+	assert.Equal(t, client1.Pool, client2.Pool)
+	err1 := client1.Pool.Close()
+	err2 := client2.Pool.Close()
+	assert.Nil(t, err1)
+	assert.Nil(t, err2)
 }
 
 var client = createClient()

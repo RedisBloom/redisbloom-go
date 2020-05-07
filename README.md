@@ -39,13 +39,13 @@ func main() {
 		// Connect to localhost with no password
     var client = redisbloom.NewClient("localhost:6379", "nohelp", nil)
        
-    // TS.ADD mytest item 
+    // BF.ADD mytest item 
     _, err := client.Add("mytest", "myItem")
     if err != nil {
         fmt.Println("Error:", err)
     }
     
-    exists, err = client.Exists("mytest", "myItem")
+    exists, err := client.Exists("mytest", "myItem")
     if err != nil {
         fmt.Println("Error:", err)
     }
