@@ -1,13 +1,12 @@
 package redis_bloom_go
 
 import (
+	"github.com/gomodule/redigo/redis"
+	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
 	"time"
-	"github.com/gomodule/redigo/redis"
-	"github.com/stretchr/testify/assert"
 )
-
 
 func getTestConnectionDetails() (string, string) {
 	value, exists := os.LookupEnv("REDISBLOOM_TEST_HOST")
@@ -31,7 +30,6 @@ func createClient() *Client {
 	}
 	return NewClient(host, "test_client", ptr)
 }
-
 
 func TestNewClientFromPool(t *testing.T) {
 	host, password := getTestConnectionDetails()
@@ -65,17 +63,17 @@ func TestReserve(t *testing.T) {
 	key := "test_RESERVE"
 	err := client.Reserve(key, 0.1, 1000)
 	assert.Nil(t, err)
-	
+
 	info, err := client.Info(key)
 	assert.Nil(t, err)
 	assert.Equal(t, info, map[string]int64{
-			"Capacity": 1000,
-			"Expansion rate": 2,
-            "Number of filters": 1,
-            "Number of items inserted": 0,
-            "Size": 932,
+		"Capacity":                 1000,
+		"Expansion rate":           2,
+		"Number of filters":        1,
+		"Number of items inserted": 0,
+		"Size":                     932,
 	})
-	
+
 	err = client.Reserve(key, 0.1, 1000)
 	assert.NotNil(t, err)
 }
@@ -83,15 +81,15 @@ func TestReserve(t *testing.T) {
 func TestAdd(t *testing.T) {
 	client.FlushAll()
 	key := "test_ADD"
-	value := "test_ADD_value";
+	value := "test_ADD_value"
 	exists, err := client.Add(key, value)
 	assert.Nil(t, err)
 	assert.True(t, exists)
-	
+
 	info, err := client.Info(key)
 	assert.Nil(t, err)
 	assert.NotNil(t, info)
-	
+
 	exists, err = client.Add(key, value)
 	assert.Nil(t, err)
 	assert.False(t, exists)
@@ -100,11 +98,11 @@ func TestAdd(t *testing.T) {
 func TestExists(t *testing.T) {
 	client.FlushAll()
 	client.Add("test_ADD", "test_EXISTS")
-	
+
 	exists, err := client.Exists("test_ADD", "test_EXISTS")
 	assert.Nil(t, err)
 	assert.True(t, exists)
-	
+
 	exists, err = client.Exists("test_ADD", "test_EXISTS1")
 	assert.Nil(t, err)
 	assert.False(t, exists)
