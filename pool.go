@@ -1,6 +1,7 @@
 package redis_bloom_go
 
 import (
+	"fmt"
 	"math/rand"
 	"sync"
 	"time"
@@ -10,11 +11,16 @@ import (
 
 type ConnPool interface {
 	Get() redis.Conn
+	Close() error
 }
 
 type SingleHostPool struct {
 	*redis.Pool
 }
+//
+//func (s SingleHostPool) Close() {
+//	s.Pool.Close()
+//}
 
 func NewSingleHostPool(host string, authPass *string) *SingleHostPool {
 	ret := &redis.Pool{
@@ -32,6 +38,25 @@ type MultiHostPool struct {
 	hosts    []string
 	authPass *string
 }
+
+
+func (p *MultiHostPool) Close() (err error) {
+	p.Lock()
+	defer p.Unlock()
+	for host, pool := range p.pools {
+		poolErr := pool.Close()
+		//preserve pool error if not nil but continue
+		if poolErr != nil {
+			if err == nil {
+				err = fmt.Errorf("Error closing pool for host %s. Got %v.", host, poolErr)
+			} else {
+				err = fmt.Errorf("%v Error closing pool for host %s. Got %v.", err, host, poolErr)
+			}
+		}
+	}
+	return
+}
+
 
 func NewMultiHostPool(hosts []string, authPass *string) *MultiHostPool {
 	return &MultiHostPool{
