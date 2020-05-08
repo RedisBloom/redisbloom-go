@@ -2,9 +2,9 @@ package redis_bloom_go
 
 import (
 	"errors"
-	"strings"
-	"strconv"
 	"github.com/gomodule/redigo/redis"
+	"strconv"
+	"strings"
 )
 
 // TODO: refactor this hard limit and revise client locking
@@ -35,7 +35,6 @@ func NewClient(addr, name string, authPass *string) *Client {
 	return ret
 }
 
-
 // NewClientFromPool creates a new Client with the given pool and client name
 func NewClientFromPool(pool *redis.Pool, name string) *Client {
 	ret := &Client{
@@ -53,10 +52,9 @@ func NewClientFromPool(pool *redis.Pool, name string) *Client {
 func (client *Client) Reserve(key string, error_rate float64, capacity uint64) (err error) {
 	conn := client.Pool.Get()
 	defer conn.Close()
-	_, err = conn.Do("BF.RESERVE", key,  strconv.FormatFloat(error_rate, 'g', 16, 64), capacity)
+	_, err = conn.Do("BF.RESERVE", key, strconv.FormatFloat(error_rate, 'g', 16, 64), capacity)
 	return err
 }
-
 
 // Add - Add (or create and add) a new value to the filter
 // args:
@@ -88,7 +86,7 @@ func (client *Client) Info(key string) (info map[string]int64, err error) {
 	if err != nil {
 		return nil, err
 	}
-	
+
 	values, err := redis.Values(result, nil)
 	if err != nil {
 		return nil, err
@@ -98,7 +96,7 @@ func (client *Client) Info(key string) (info map[string]int64, err error) {
 	}
 	info = map[string]int64{}
 	for i := 0; i < len(values); i += 2 {
-		key, err = redis.String(values[i], nil)	
+		key, err = redis.String(values[i], nil)
 		if err != nil {
 			return nil, err
 		}
@@ -107,5 +105,5 @@ func (client *Client) Info(key string) (info map[string]int64, err error) {
 			return nil, err
 		}
 	}
-	return info, nil				
+	return info, nil
 }
