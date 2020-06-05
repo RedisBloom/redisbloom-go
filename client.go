@@ -44,11 +44,11 @@ func NewClientFromPool(pool *redis.Pool, name string) *Client {
 	return ret
 }
 
-// Reserve - Creates an empty Bloom Filter with a given desired error ratio and initial capacity. 
+// Reserve - Creates an empty Bloom Filter with a given desired error ratio and initial capacity.
 // args:
 // key - the name of the filter
 // error_rate - the desired probability for false positives
-// capacity - the number of entries you intend to add to the filter 
+// capacity - the number of entries you intend to add to the filter
 func (client *Client) Reserve(key string, error_rate float64, capacity uint64) (err error) {
 	conn := client.Pool.Get()
 	defer conn.Close()
@@ -58,27 +58,27 @@ func (client *Client) Reserve(key string, error_rate float64, capacity uint64) (
 
 // Add - Add (or create and add) a new value to the filter
 // args:
-// key - the name of the filter 
-// item - the item to add 
+// key - the name of the filter
+// item - the item to add
 func (client *Client) Add(key string, item string) (exists bool, err error) {
 	conn := client.Pool.Get()
 	defer conn.Close()
 	return redis.Bool(conn.Do("BF.ADD", key, item))
 }
 
-// Exists - Determines whether an item may exist in the Bloom Filter or not. 
+// Exists - Determines whether an item may exist in the Bloom Filter or not.
 // args:
-// key - the name of the filter 
-// item - the item to check for 
+// key - the name of the filter
+// item - the item to check for
 func (client *Client) Exists(key string, item string) (exists bool, err error) {
 	conn := client.Pool.Get()
 	defer conn.Close()
 	return redis.Bool(conn.Do("BF.EXISTS", key, item))
 }
 
-// Info - Return information about key  
+// Info - Return information about key
 // args:
-// key - the name of the filter 
+// key - the name of the filter
 func (client *Client) Info(key string) (info map[string]int64, err error) {
 	conn := client.Pool.Get()
 	defer conn.Close()
@@ -106,4 +106,47 @@ func (client *Client) Info(key string) (info map[string]int64, err error) {
 		}
 	}
 	return info, nil
+}
+
+// Initializes a TopK with specified parameters.
+func (client *Client) TopkReserve(key string, topk int64, width int64, depth int64, decay float64) (string, error) {
+	conn := client.Pool.Get()
+	defer conn.Close()
+	result, err := conn.Do("TOPK.RESERVE", key, topk, width, depth, strconv.FormatFloat(decay, 'g', 16, 64))
+	return redis.String(result, err)
+}
+
+// Adds an item to the data structure.
+func (client *Client) TopkAdd(key string, items []string) ([]string, error) {
+	conn := client.Pool.Get()
+	defer conn.Close()
+	args := redis.Args{key}.AddFlat(items)
+	result, err := conn.Do("TOPK.ADD", args...)
+	return redis.Strings(result, err)
+}
+
+// Returns count for an item.
+func (client *Client) TopkCount(key string, items []string) ([]string, error) {
+	conn := client.Pool.Get()
+	defer conn.Close()
+	args := redis.Args{key}.AddFlat(items)
+	result, err := conn.Do("TOPK.COUNT", args...)
+	return redis.Strings(result, err)
+}
+
+// Checks whether an item is one of Top-K items.
+func (client *Client) TopkQuery(key string, items []string) ([]int64, error) {
+	conn := client.Pool.Get()
+	defer conn.Close()
+	args := redis.Args{key}.AddFlat(items)
+	result, err := conn.Do("TOPK.QUERY", args...)
+	return redis.Int64s(result, err)
+}
+
+// Return full list of items in Top K list.
+func (client *Client) TopkList(key string) ([]string, error) {
+	conn := client.Pool.Get()
+	defer conn.Close()
+	result, err := conn.Do("TOPK.LIST", key)
+	return redis.Strings(result, err)
 }

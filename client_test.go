@@ -107,3 +107,41 @@ func TestExists(t *testing.T) {
 	assert.Nil(t, err)
 	assert.False(t, exists)
 }
+
+func TestClient_TopkReserve(t *testing.T) {
+	client.FlushAll()
+	ret, err := client.TopkReserve("test_topk_reserve", 10, 2000, 7, 0.925)
+	assert.Nil(t, err)
+	assert.Equal(t, "OK", ret)
+}
+
+func TestClient_TopkAdd(t *testing.T) {
+	client.FlushAll()
+	key := "test_topk_add"
+	ret, err := client.TopkReserve(key, 10, 2000, 7, 0.925)
+	assert.Nil(t, err)
+	assert.Equal(t, "OK", ret)
+	rets, err := client.TopkAdd(key, []string{"test", "test1", "test3"})
+	assert.Nil(t, err)
+	assert.Equal(t, 3, len(rets))
+}
+
+func TestClient_TopkQuery(t *testing.T) {
+	client.FlushAll()
+	key := "test_topk_query"
+	ret, err := client.TopkReserve(key, 10, 2000, 7, 0.925)
+	assert.Nil(t, err)
+	assert.Equal(t, "OK", ret)
+	rets, err := client.TopkAdd(key, []string{"test"})
+	assert.Nil(t, err)
+	assert.NotNil(t, rets)
+	queryRet, err := client.TopkQuery(key, []string{"test", "nonexist"})
+	assert.Nil(t, err)
+	assert.Equal(t, 2, len(queryRet))
+	assert.Equal(t, int64(1), queryRet[0])
+	assert.Equal(t, int64(0), queryRet[1])
+
+	keys, err := client.TopkList(key)
+	assert.Nil(t, err)
+	assert.Equal(t, 10, len(keys))
+}
