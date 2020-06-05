@@ -44,11 +44,11 @@ func NewClientFromPool(pool *redis.Pool, name string) *Client {
 	return ret
 }
 
-// Reserve - Creates an empty Bloom Filter with a given desired error ratio and initial capacity. 
+// Reserve - Creates an empty Bloom Filter with a given desired error ratio and initial capacity.
 // args:
 // key - the name of the filter
 // error_rate - the desired probability for false positives
-// capacity - the number of entries you intend to add to the filter 
+// capacity - the number of entries you intend to add to the filter
 func (client *Client) Reserve(key string, error_rate float64, capacity uint64) (err error) {
 	conn := client.Pool.Get()
 	defer conn.Close()
@@ -58,27 +58,27 @@ func (client *Client) Reserve(key string, error_rate float64, capacity uint64) (
 
 // Add - Add (or create and add) a new value to the filter
 // args:
-// key - the name of the filter 
-// item - the item to add 
+// key - the name of the filter
+// item - the item to add
 func (client *Client) Add(key string, item string) (exists bool, err error) {
 	conn := client.Pool.Get()
 	defer conn.Close()
 	return redis.Bool(conn.Do("BF.ADD", key, item))
 }
 
-// Exists - Determines whether an item may exist in the Bloom Filter or not. 
+// Exists - Determines whether an item may exist in the Bloom Filter or not.
 // args:
-// key - the name of the filter 
-// item - the item to check for 
+// key - the name of the filter
+// item - the item to check for
 func (client *Client) Exists(key string, item string) (exists bool, err error) {
 	conn := client.Pool.Get()
 	defer conn.Close()
 	return redis.Bool(conn.Do("BF.EXISTS", key, item))
 }
 
-// Info - Return information about key  
+// Info - Return information about key
 // args:
-// key - the name of the filter 
+// key - the name of the filter
 func (client *Client) Info(key string) (info map[string]int64, err error) {
 	conn := client.Pool.Get()
 	defer conn.Close()
@@ -106,4 +106,28 @@ func (client *Client) Info(key string) (info map[string]int64, err error) {
 		}
 	}
 	return info, nil
+}
+
+// BfAddMulti - Adds one or more items to the Bloom Filter, creating the filter if it does not yet exist.
+// args:
+// key - the name of the filter
+// item - One or more items to add
+func (client *Client) BfAddMulti(key string, items []string) ([]int64, error) {
+	conn := client.Pool.Get()
+	defer conn.Close()
+	args := redis.Args{key}.AddFlat(items)
+	result, err := conn.Do("BF.MADD", args...)
+	return redis.Int64s(result, err)
+}
+
+// BfExistsMulti - Determines if one or more items may exist in the filter or not.
+// args:
+// key - the name of the filter
+// item - one or more items to check
+func (client *Client) BfExistsMulti(key string, items []string) ([]int64, error) {
+	conn := client.Pool.Get()
+	defer conn.Close()
+	args := redis.Args{key}.AddFlat(items)
+	result, err := conn.Do("BF.MEXISTS", args...)
+	return redis.Int64s(result, err)
 }
