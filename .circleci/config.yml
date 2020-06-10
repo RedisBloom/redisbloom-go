@@ -14,7 +14,9 @@ jobs:
     working_directory: /go/src/github.com/RedisBloom/redisbloom-go
     steps:
       - checkout
-      - run: make checkfmt
+      - run: go get -v -t -d ./...
+
+      #run tests with coverage
       - run: make get
       - run: make coverage
       - run: bash <(curl -s https://codecov.io/bash) -t ${CODECOV_TOKEN}
