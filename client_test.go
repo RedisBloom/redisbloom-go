@@ -163,7 +163,14 @@ func TestClient_TopkQuery(t *testing.T) {
 	assert.Equal(t, int64(1), queryRet[0])
 	assert.Equal(t, int64(0), queryRet[1])
 
-	keys, err := client.TopkList(key)
+	key1 := "test_topk_list"
+	ret, err = client.TopkReserve(key1, 3, 50, 3, 0.9)
 	assert.Nil(t, err)
-	assert.Equal(t, 10, len(keys))
+	assert.Equal(t, "OK", ret)
+	client.TopkAdd(key1, []string{"A", "B", "C", "D", "E", "A", "A", "B", "C",
+		"G", "D", "B", "D", "A", "E", "E"})
+	keys, err := client.TopkList(key1)
+	assert.Nil(t, err)
+	assert.Equal(t, 3, len(keys))
+	assert.Equal(t, []string{"D", "A", "B"}, keys)
 }
