@@ -108,6 +108,28 @@ func TestExists(t *testing.T) {
 	assert.False(t, exists)
 }
 
+func TestClient_BfAddMulti(t *testing.T) {
+	client.FlushAll()
+	ret, err := client.BfAddMulti("test_add_multi", []string{"a", "b", "c"})
+	assert.Nil(t, err)
+	assert.NotNil(t, ret)
+}
+
+func TestClient_BfExistsMulti(t *testing.T) {
+	client.FlushAll()
+	key := "test_exists_multi"
+	ret, err := client.BfAddMulti(key, []string{"a", "b", "c"})
+	assert.Nil(t, err)
+	assert.NotNil(t, ret)
+
+	existsResult, err := client.BfExistsMulti(key, []string{"a", "b", "notexists"})
+	assert.Nil(t, err)
+	assert.Equal(t, 3, len(existsResult))
+	assert.Equal(t, int64(1), existsResult[0])
+	assert.Equal(t, int64(1), existsResult[1])
+	assert.Equal(t, int64(0), existsResult[2])
+}
+
 func TestClient_TopkReserve(t *testing.T) {
 	client.FlushAll()
 	ret, err := client.TopkReserve("test_topk_reserve", 10, 2000, 7, 0.925)
