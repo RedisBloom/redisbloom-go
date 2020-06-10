@@ -107,3 +107,27 @@ func (client *Client) Info(key string) (info map[string]int64, err error) {
 	}
 	return info, nil
 }
+
+// BfAddMulti - Adds one or more items to the Bloom Filter, creating the filter if it does not yet exist.
+// args:
+// key - the name of the filter
+// item - One or more items to add
+func (client *Client) BfAddMulti(key string, items []string) ([]int64, error) {
+	conn := client.Pool.Get()
+	defer conn.Close()
+	args := redis.Args{key}.AddFlat(items)
+	result, err := conn.Do("BF.MADD", args...)
+	return redis.Int64s(result, err)
+}
+
+// BfExistsMulti - Determines if one or more items may exist in the filter or not.
+// args:
+// key - the name of the filter
+// item - one or more items to check
+func (client *Client) BfExistsMulti(key string, items []string) ([]int64, error) {
+	conn := client.Pool.Get()
+	defer conn.Close()
+	args := redis.Args{key}.AddFlat(items)
+	result, err := conn.Do("BF.MEXISTS", args...)
+	return redis.Int64s(result, err)
+}
