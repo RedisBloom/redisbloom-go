@@ -17,6 +17,7 @@ type ConnPool interface {
 type SingleHostPool struct {
 	*redis.Pool
 }
+
 //
 //func (s SingleHostPool) Close() {
 //	s.Pool.Close()
@@ -39,7 +40,6 @@ type MultiHostPool struct {
 	authPass *string
 }
 
-
 func (p *MultiHostPool) Close() (err error) {
 	p.Lock()
 	defer p.Unlock()
@@ -56,7 +56,6 @@ func (p *MultiHostPool) Close() (err error) {
 	}
 	return
 }
-
 
 func NewMultiHostPool(hosts []string, authPass *string) *MultiHostPool {
 	return &MultiHostPool{

@@ -2,9 +2,9 @@ package redis_bloom_go
 
 import (
 	"errors"
-	"strings"
-	"strconv"
 	"github.com/gomodule/redigo/redis"
+	"strconv"
+	"strings"
 )
 
 // TODO: refactor this hard limit and revise client locking
@@ -35,7 +35,6 @@ func NewClient(addr, name string, authPass *string) *Client {
 	return ret
 }
 
-
 // NewClientFromPool creates a new Client with the given pool and client name
 func NewClientFromPool(pool *redis.Pool, name string) *Client {
 	ret := &Client{
@@ -45,42 +44,41 @@ func NewClientFromPool(pool *redis.Pool, name string) *Client {
 	return ret
 }
 
-// Reserve - Creates an empty Bloom Filter with a given desired error ratio and initial capacity. 
+// Reserve - Creates an empty Bloom Filter with a given desired error ratio and initial capacity.
 // args:
 // key - the name of the filter
 // error_rate - the desired probability for false positives
-// capacity - the number of entries you intend to add to the filter 
+// capacity - the number of entries you intend to add to the filter
 func (client *Client) Reserve(key string, error_rate float64, capacity uint64) (err error) {
 	conn := client.Pool.Get()
 	defer conn.Close()
-	_, err = conn.Do("BF.RESERVE", key,  strconv.FormatFloat(error_rate, 'g', 16, 64), capacity)
+	_, err = conn.Do("BF.RESERVE", key, strconv.FormatFloat(error_rate, 'g', 16, 64), capacity)
 	return err
 }
 
-
 // Add - Add (or create and add) a new value to the filter
 // args:
-// key - the name of the filter 
-// item - the item to add 
+// key - the name of the filter
+// item - the item to add
 func (client *Client) Add(key string, item string) (exists bool, err error) {
 	conn := client.Pool.Get()
 	defer conn.Close()
 	return redis.Bool(conn.Do("BF.ADD", key, item))
 }
 
-// Exists - Determines whether an item may exist in the Bloom Filter or not. 
+// Exists - Determines whether an item may exist in the Bloom Filter or not.
 // args:
-// key - the name of the filter 
-// item - the item to check for 
+// key - the name of the filter
+// item - the item to check for
 func (client *Client) Exists(key string, item string) (exists bool, err error) {
 	conn := client.Pool.Get()
 	defer conn.Close()
 	return redis.Bool(conn.Do("BF.EXISTS", key, item))
 }
 
-// Info - Return information about key  
+// Info - Return information about key
 // args:
-// key - the name of the filter 
+// key - the name of the filter
 func (client *Client) Info(key string) (info map[string]int64, err error) {
 	conn := client.Pool.Get()
 	defer conn.Close()
@@ -88,7 +86,7 @@ func (client *Client) Info(key string) (info map[string]int64, err error) {
 	if err != nil {
 		return nil, err
 	}
-	
+
 	values, err := redis.Values(result, nil)
 	if err != nil {
 		return nil, err
@@ -98,7 +96,7 @@ func (client *Client) Info(key string) (info map[string]int64, err error) {
 	}
 	info = map[string]int64{}
 	for i := 0; i < len(values); i += 2 {
-		key, err = redis.String(values[i], nil)	
+		key, err = redis.String(values[i], nil)
 		if err != nil {
 			return nil, err
 		}
@@ -107,5 +105,5 @@ func (client *Client) Info(key string) (info map[string]int64, err error) {
 			return nil, err
 		}
 	}
-	return info, nil				
+	return info, nil
 }
