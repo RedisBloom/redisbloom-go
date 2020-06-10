@@ -55,10 +55,59 @@ func main() {
 
 ## Supported RedisBloom Commands
 
+### Bloom Filter
+
 | Command | Recommended API and godoc  |
 | :---          |  ----: |
-| [BF.ADD](https://oss.redislabs.com/redisbloom/Bloom_Commands/#bfadd) |  |
-| [BF.EXISTS](https://oss.redislabs.com/redisbloom/Bloom_Commands/#bfexists) |  |
+| [BF.RESERVE](https://oss.redislabs.com/redisbloom/Bloom_Commands/#bfreserve) | [Reserve](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.Reserve) |
+| [BF.ADD](https://oss.redislabs.com/redisbloom/Bloom_Commands/#bfadd) | [Add](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.Add) |
+| [BF.MADD](https://oss.redislabs.com/redisbloom/Bloom_Commands/#bfmadd) | N/A |
+| [BF.INSERT](https://oss.redislabs.com/redisbloom/Bloom_Commands/#bfinsert) | N/A |
+| [BF.EXISTS](https://oss.redislabs.com/redisbloom/Bloom_Commands/#bfexists) | [Exists](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.Exists) |
+| [BF.MEXISTS](https://oss.redislabs.com/redisbloom/Bloom_Commands/#bfmexists) | N/A |
+| [BF.SCANDUMP](https://oss.redislabs.com/redisbloom/Bloom_Commands/#bfscandump) | N/A |
+| [BF.LOADCHUNK](https://oss.redislabs.com/redisbloom/Bloom_Commands/#bfloadchunk) | N/A |
+| [BF.INFO](https://oss.redislabs.com/redisbloom/Bloom_Commands/#bfinfo) | [Info](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.Info) |
+
+### Cuckoo Filter
+
+| Command | Recommended API and godoc  |
+| :---          |  ----: |
+| [CF.RESERVE](https://oss.redislabs.com/redisbloom/Cuckoo_Commands/#cfreserve) | N/A |
+| [CF.ADD](https://oss.redislabs.com/redisbloom/Cuckoo_Commands/#cfadd) |  N/A |
+| [CF.ADDNX](https://oss.redislabs.com/redisbloom/Cuckoo_Commands/#cfaddnx) |  N/A |
+| [CF.INSERT](https://oss.redislabs.com/redisbloom/Cuckoo_Commands/#cfinsert) |  N/A |
+| [CF.INSERTNX](https://oss.redislabs.com/redisbloom/Cuckoo_Commands/#cfinsertnx) |  N/A |
+| [CF.EXISTS](https://oss.redislabs.com/redisbloom/Cuckoo_Commands/#cfexists) |  N/A |
+| [CF.DEL](https://oss.redislabs.com/redisbloom/Cuckoo_Commands/#cfdel) |  N/A |
+| [CF.COUNT](https://oss.redislabs.com/redisbloom/Cuckoo_Commands/#cfcount) |  N/A |
+| [CF.SCANDUMP](https://oss.redislabs.com/redisbloom/Cuckoo_Commands/#cfscandump) |  N/A |
+| [CF.LOADCHUNK](https://oss.redislabs.com/redisbloom/Cuckoo_Commands/#cfloadchunck) |  N/A |
+| [CF.INFO](https://oss.redislabs.com/redisbloom/Cuckoo_Commands/#cfinfo) |  N/A |
+
+### Count-Min Sketch
+
+| Command | Recommended API and godoc  |
+| :---          |  ----: |
+| [CMS.INITBYDIM](https://oss.redislabs.com/redisbloom/CountMinSketch_Commands/#cmsinitbydim) | N/A |
+| [CMS.INITBYPROB](https://oss.redislabs.com/redisbloom/CountMinSketch_Commands/#cmsinitbyprob) |  N/A |
+| [CMS.INCRBY](https://oss.redislabs.com/redisbloom/CountMinSketch_Commands/#cmsincrby) |  N/A |
+| [CMS.QUERY](https://oss.redislabs.com/redisbloom/CountMinSketch_Commands/#cmsquery) |  N/A |
+| [CMS.MERGE](https://oss.redislabs.com/redisbloom/CountMinSketch_Commands/#cmsmerge) |  N/A |
+| [CMS.INFO](https://oss.redislabs.com/redisbloom/CountMinSketch_Commands/#cmsinfo) |  N/A |
+
+### TopK Filter
+
+| Command | Recommended API and godoc  |
+| :---          |  ----: |
+| [TOPK.RESERVE](https://oss.redislabs.com/redisbloom/TopK_Commands/#topkreserve) | N/A |
+| [TOPK.ADD](https://oss.redislabs.com/redisbloom/TopK_Commands/#topkadd) |  N/A |
+| [TOPK.INCRBY](https://oss.redislabs.com/redisbloom/TopK_Commands/#topkincrby) |  N/A |
+| [TOPK.QUERY](https://oss.redislabs.com/redisbloom/TopK_Commands/#topkquery) |  N/A |
+| [TOPK.COUNT](https://oss.redislabs.com/redisbloom/TopK_Commands/#topkcount) |  N/A |
+| [TOPK.LIST](https://oss.redislabs.com/redisbloom/TopK_Commands/#topklist) |  N/A |
+| [TOPK.INFO](https://oss.redislabs.com/redisbloom/TopK_Commands/#topkinfo) |  N/A |
+
 
 ## License
 
