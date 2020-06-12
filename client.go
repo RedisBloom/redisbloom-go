@@ -2,6 +2,7 @@ package redis_bloom_go
 
 import (
 	"errors"
+	"fmt"
 	"github.com/gomodule/redigo/redis"
 	"strconv"
 	"strings"
@@ -173,4 +174,33 @@ func (client *Client) TopkList(key string) ([]string, error) {
 	defer conn.Close()
 	result, err := conn.Do("TOPK.LIST", key)
 	return redis.Strings(result, err)
+}
+
+// Returns number of required items (k), width, depth and decay values.
+func (client *Client) TopkInfo(key string) (map[string]string, error) {
+	conn := client.Pool.Get()
+	defer conn.Close()
+	reply, err := conn.Do("TOPK.INFO", key)
+	values, err := redis.Values(reply, err)
+	if err != nil {
+		return nil, err
+	}
+	if len(values)%2 != 0 {
+		return nil, errors.New("expects even number of values result")
+	}
+
+	m := make(map[string]string, len(values)/2)
+	for i := 0; i < len(values); i += 2 {
+		k := values[i].(string)
+		switch v := values[i+1].(type) {
+		case []byte:
+			m[k] = string(values[i+1].([]byte))
+			break
+		case int64:
+			m[k] = strconv.FormatInt(values[i+1].(int64), 10)
+		default:
+			return nil, fmt.Errorf("unexpected element type for (Ints,String), got type %T", v)
+		}
+	}
+	return m, err
 }

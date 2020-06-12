@@ -174,3 +174,19 @@ func TestClient_TopkQuery(t *testing.T) {
 	assert.Equal(t, 3, len(keys))
 	assert.Equal(t, []string{"D", "A", "B"}, keys)
 }
+
+func TestClient_TopkInfo(t *testing.T) {
+	client.FlushAll()
+	key := "test_topk_info"
+	ret, err := client.TopkReserve(key, 10, 2000, 7, 0.925)
+	assert.Nil(t, err)
+	assert.Equal(t, "OK", ret)
+
+	info, err := client.TopkInfo(key)
+	assert.Equal(t, "10", info["k"])
+	assert.Equal(t, "2000", info["width"])
+	assert.Equal(t, "7", info["depth"])
+
+	info, err = client.TopkInfo("notexists")
+	assert.NotNil(t, err)
+}
