@@ -206,7 +206,7 @@ func (client *Client) TopkInfo(key string) (map[string]string, error) {
 }
 
 // Increase the score of an item in the data structure by increment.
-func (client *Client) TopkIncrby(key string, itemIncrements map[string]int64) ([]string, error) {
+func (client *Client) TopkIncrBy(key string, itemIncrements map[string]int64) ([]string, error) {
 	conn := client.Pool.Get()
 	defer conn.Close()
 	args := redis.Args{key}

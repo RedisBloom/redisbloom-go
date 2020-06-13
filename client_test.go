@@ -202,7 +202,7 @@ func TestClient_TopkIncrby(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, rets)
 
-	rets, err = client.TopkIncrby(key, map[string]int64{"foo": 3, "bar": 2, "42": 30})
+	rets, err = client.TopkIncrBy(key, map[string]int64{"foo": 3, "bar": 2, "42": 30})
 	assert.Nil(t, err)
 	assert.Equal(t, 3, len(rets))
 	assert.Equal(t, "", rets[2])
