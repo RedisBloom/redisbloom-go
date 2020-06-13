@@ -129,3 +129,76 @@ func TestClient_BfExistsMulti(t *testing.T) {
 	assert.Equal(t, int64(1), existsResult[1])
 	assert.Equal(t, int64(0), existsResult[2])
 }
+
+func TestClient_CmsInitByDim(t *testing.T) {
+	client.FlushAll()
+	ret, err := client.CmsInitByDim("test_cms_initbydim", 1000, 5)
+	assert.Nil(t, err)
+	assert.Equal(t, "OK", ret)
+}
+
+func TestClient_CmsInitByProb(t *testing.T) {
+	client.FlushAll()
+	ret, err := client.CmsInitByProb("test_cms_initbyprob", 0.01, 0.01)
+	assert.Nil(t, err)
+	assert.Equal(t, "OK", ret)
+}
+
+func TestClient_CmsIncrBy(t *testing.T) {
+	client.FlushAll()
+	key := "test_cms_incrby"
+	ret, err := client.CmsInitByDim(key, 1000, 5)
+	assert.Nil(t, err)
+	assert.Equal(t, "OK", ret)
+	results, err := client.CmsIncrBy(key, map[string]int64{"foo": 5})
+	assert.Nil(t, err)
+	assert.NotNil(t, results)
+	assert.Equal(t, int64(5), results[0])
+}
+
+func TestClient_CmsQuery(t *testing.T) {
+	client.FlushAll()
+	key := "test_cms_query"
+	ret, err := client.CmsInitByDim(key, 1000, 5)
+	assert.Nil(t, err)
+	assert.Equal(t, "OK", ret)
+	results, err := client.CmsQuery(key, []string{"notexist"})
+	assert.Nil(t, err)
+	assert.NotNil(t, 0, results[0])
+	_, err = client.CmsIncrBy(key, map[string]int64{"foo": 5})
+	assert.Nil(t, err)
+	results, err = client.CmsQuery(key, []string{"foo"})
+	assert.Nil(t, err)
+	assert.Equal(t, int64(5), results[0])
+}
+
+func TestClient_CmsMerge(t *testing.T) {
+	client.FlushAll()
+	ret, err := client.CmsInitByDim("A", 1000, 5)
+	assert.Nil(t, err)
+	assert.Equal(t, "OK", ret)
+	ret, err = client.CmsInitByDim("B", 1000, 5)
+	assert.Nil(t, err)
+	assert.Equal(t, "OK", ret)
+	ret, err = client.CmsInitByDim("C", 1000, 5)
+	assert.Nil(t, err)
+	assert.Equal(t, "OK", ret)
+	client.CmsIncrBy("A", map[string]int64{"foo": 5, "bar": 3, "baz": 9})
+	client.CmsIncrBy("B", map[string]int64{"foo": 2, "bar": 3, "baz": 1})
+	client.CmsMerge("C", []string{"A", "B"}, nil)
+	results, err := client.CmsQuery("C", []string{"foo", "bar", "baz"})
+	assert.Equal(t, []int64{7, 6, 10}, results)
+}
+
+func TestClient_CmsInfo(t *testing.T) {
+	client.FlushAll()
+	key := "test_cms_info"
+	ret, err := client.CmsInitByDim(key, 1000, 5)
+	assert.Nil(t, err)
+	assert.Equal(t, "OK", ret)
+	info, err := client.CmsInfo(key)
+	assert.Nil(t, err)
+	assert.Equal(t, int64(1000), info["width"])
+	assert.Equal(t, int64(5), info["depth"])
+	assert.Equal(t, int64(0), info["count"])
+}

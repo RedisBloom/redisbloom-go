@@ -131,3 +131,71 @@ func (client *Client) BfExistsMulti(key string, items []string) ([]int64, error)
 	result, err := conn.Do("BF.MEXISTS", args...)
 	return redis.Int64s(result, err)
 }
+
+// Initializes a Count-Min Sketch to dimensions specified by user.
+func (client *Client) CmsInitByDim(key string, width int64, depth int64) (string, error) {
+	conn := client.Pool.Get()
+	defer conn.Close()
+	result, err := conn.Do("CMS.INITBYDIM", key, width, depth)
+	return redis.String(result, err)
+}
+
+// Initializes a Count-Min Sketch to accommodate requested capacity.
+func (client *Client) CmsInitByProb(key string, error float64, probability float64) (string, error) {
+	conn := client.Pool.Get()
+	defer conn.Close()
+	result, err := conn.Do("CMS.INITBYPROB", key, error, probability)
+	return redis.String(result, err)
+}
+
+// Increases the count of item by increment. Multiple items can be increased with one call.
+func (client *Client) CmsIncrBy(key string, itemIncrements map[string]int64) ([]int64, error) {
+	conn := client.Pool.Get()
+	defer conn.Close()
+	args := redis.Args{key}
+	for k, v := range itemIncrements {
+		args = args.Add(k, v)
+	}
+	result, err := conn.Do("CMS.INCRBY", args...)
+	return redis.Int64s(result, err)
+}
+
+// Returns count for item.
+func (client *Client) CmsQuery(key string, items []string) ([]int64, error) {
+	conn := client.Pool.Get()
+	defer conn.Close()
+	args := redis.Args{key}.AddFlat(items)
+	result, err := conn.Do("CMS.QUERY", args...)
+	return redis.Int64s(result, err)
+}
+
+// Merges several sketches into one sketch.
+func (client *Client) CmsMerge(key string, srcs []string, weights []string) (string, error) {
+	conn := client.Pool.Get()
+	defer conn.Close()
+	args := redis.Args{key}.Add(len(srcs)).AddFlat(srcs)
+	if weights != nil && len(weights) > 0 {
+		args = args.Add("WEIGHTS").AddFlat(weights)
+	}
+	return redis.String(conn.Do("CMS.MERGE", args...))
+}
+
+// Returns width, depth and total count of the sketch.
+func (client *Client) CmsInfo(key string) (map[string]int64, error) {
+	conn := client.Pool.Get()
+	defer conn.Close()
+	reply, err := conn.Do("CMS.INFO", key)
+
+	values, err := redis.Values(reply, err)
+	if err != nil {
+		return nil, err
+	}
+	if len(values)%2 != 0 {
+		return nil, errors.New("expects even number of values result")
+	}
+	m := make(map[string]int64, len(values)/2)
+	for i := 0; i < len(values); i += 2 {
+		m[values[i].(string)] = values[i+1].(int64)
+	}
+	return m, err
+}
