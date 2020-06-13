@@ -190,3 +190,20 @@ func TestClient_TopkInfo(t *testing.T) {
 	info, err = client.TopkInfo("notexists")
 	assert.NotNil(t, err)
 }
+
+func TestClient_TopkIncrby(t *testing.T) {
+	client.FlushAll()
+	key := "test_topk_incrby"
+	ret, err := client.TopkReserve(key, 50, 2000, 7, 0.925)
+	assert.Nil(t, err)
+	assert.Equal(t, "OK", ret)
+
+	rets, err := client.TopkAdd(key, []string{"foo", "bar", "42"})
+	assert.Nil(t, err)
+	assert.NotNil(t, rets)
+
+	rets, err = client.TopkIncrby(key, map[string]int64{"foo": 3, "bar": 2, "42": 30})
+	assert.Nil(t, err)
+	assert.Equal(t, 3, len(rets))
+	assert.Equal(t, "", rets[2])
+}

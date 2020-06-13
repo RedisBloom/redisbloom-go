@@ -102,7 +102,7 @@ func main() {
 | :---          |  ----: |
 | [TOPK.RESERVE](https://oss.redislabs.com/redisbloom/TopK_Commands/#topkreserve) |  [TopkReserve](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.TopkReserve)  |
 | [TOPK.ADD](https://oss.redislabs.com/redisbloom/TopK_Commands/#topkadd) |   [TopkAdd](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.TopkAdd)  |
-| [TOPK.INCRBY](https://oss.redislabs.com/redisbloom/TopK_Commands/#topkincrby) |  N/A  |
+| [TOPK.INCRBY](https://oss.redislabs.com/redisbloom/TopK_Commands/#topkincrby) |  [TopkIncrby](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.TopkIncrby)  |
 | [TOPK.QUERY](https://oss.redislabs.com/redisbloom/TopK_Commands/#topkquery) |   [TopkQuery](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.TopkQuery)  |
 | [TOPK.COUNT](https://oss.redislabs.com/redisbloom/TopK_Commands/#topkcount) |   [TopkCount](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.TopkCount)  |
 | [TOPK.LIST](https://oss.redislabs.com/redisbloom/TopK_Commands/#topklist) |   [TopkList](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.TopkList)  |
