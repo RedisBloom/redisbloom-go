@@ -191,7 +191,7 @@ func TestClient_TopkInfo(t *testing.T) {
 	assert.NotNil(t, err)
 }
 
-func TestClient_TopkIncrby(t *testing.T) {
+func TestClient_TopkIncrBy(t *testing.T) {
 	client.FlushAll()
 	key := "test_topk_incrby"
 	ret, err := client.TopkReserve(key, 50, 2000, 7, 0.925)
