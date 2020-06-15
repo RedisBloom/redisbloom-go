@@ -61,10 +61,10 @@ func main() {
 | :---          |  ----: |
 | [BF.RESERVE](https://oss.redislabs.com/redisbloom/Bloom_Commands/#bfreserve) | [Reserve](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.Reserve) |
 | [BF.ADD](https://oss.redislabs.com/redisbloom/Bloom_Commands/#bfadd) | [Add](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.Add) |
-| [BF.MADD](https://oss.redislabs.com/redisbloom/Bloom_Commands/#bfmadd) | N/A |
+| [BF.MADD](https://oss.redislabs.com/redisbloom/Bloom_Commands/#bfmadd) | [BfAddMulti](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.BfAddMulti)  |
 | [BF.INSERT](https://oss.redislabs.com/redisbloom/Bloom_Commands/#bfinsert) | N/A |
 | [BF.EXISTS](https://oss.redislabs.com/redisbloom/Bloom_Commands/#bfexists) | [Exists](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.Exists) |
-| [BF.MEXISTS](https://oss.redislabs.com/redisbloom/Bloom_Commands/#bfmexists) | N/A |
+| [BF.MEXISTS](https://oss.redislabs.com/redisbloom/Bloom_Commands/#bfmexists) | [BfExistsMulti](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.BfExistsMulti) |
 | [BF.SCANDUMP](https://oss.redislabs.com/redisbloom/Bloom_Commands/#bfscandump) | N/A |
 | [BF.LOADCHUNK](https://oss.redislabs.com/redisbloom/Bloom_Commands/#bfloadchunk) | N/A |
 | [BF.INFO](https://oss.redislabs.com/redisbloom/Bloom_Commands/#bfinfo) | [Info](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.Info) |
@@ -89,12 +89,12 @@ func main() {
 
 | Command | Recommended API and godoc  |
 | :---          |  ----: |
-| [CMS.INITBYDIM](https://oss.redislabs.com/redisbloom/CountMinSketch_Commands/#cmsinitbydim) | N/A |
-| [CMS.INITBYPROB](https://oss.redislabs.com/redisbloom/CountMinSketch_Commands/#cmsinitbyprob) |  N/A |
-| [CMS.INCRBY](https://oss.redislabs.com/redisbloom/CountMinSketch_Commands/#cmsincrby) |  N/A |
-| [CMS.QUERY](https://oss.redislabs.com/redisbloom/CountMinSketch_Commands/#cmsquery) |  N/A |
-| [CMS.MERGE](https://oss.redislabs.com/redisbloom/CountMinSketch_Commands/#cmsmerge) |  N/A |
-| [CMS.INFO](https://oss.redislabs.com/redisbloom/CountMinSketch_Commands/#cmsinfo) |  N/A |
+| [CMS.INITBYDIM](https://oss.redislabs.com/redisbloom/CountMinSketch_Commands/#cmsinitbydim) | [CmsInitByDim](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.CmsInitByDim) |
+| [CMS.INITBYPROB](https://oss.redislabs.com/redisbloom/CountMinSketch_Commands/#cmsinitbyprob) |  [CmsInitByProb](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.CmsInitByProb) |
+| [CMS.INCRBY](https://oss.redislabs.com/redisbloom/CountMinSketch_Commands/#cmsincrby) |  [CmsIncrBy](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.CmsIncrBy) |
+| [CMS.QUERY](https://oss.redislabs.com/redisbloom/CountMinSketch_Commands/#cmsquery) | [CmsQuery](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.CmsQuery) |
+| [CMS.MERGE](https://oss.redislabs.com/redisbloom/CountMinSketch_Commands/#cmsmerge) |  [CmsMerge](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.CmsMerge) |
+| [CMS.INFO](https://oss.redislabs.com/redisbloom/CountMinSketch_Commands/#cmsinfo) |  [CmsInfo](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.CmsInfo) |
 
 ### TopK Filter
 
