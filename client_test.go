@@ -130,6 +130,84 @@ func TestClient_BfExistsMulti(t *testing.T) {
 	assert.Equal(t, int64(0), existsResult[2])
 }
 
+func TestClient_TopkReserve(t *testing.T) {
+	client.FlushAll()
+	ret, err := client.TopkReserve("test_topk_reserve", 10, 2000, 7, 0.925)
+	assert.Nil(t, err)
+	assert.Equal(t, "OK", ret)
+}
+
+func TestClient_TopkAdd(t *testing.T) {
+	client.FlushAll()
+	key := "test_topk_add"
+	ret, err := client.TopkReserve(key, 10, 2000, 7, 0.925)
+	assert.Nil(t, err)
+	assert.Equal(t, "OK", ret)
+	rets, err := client.TopkAdd(key, []string{"test", "test1", "test3"})
+	assert.Nil(t, err)
+	assert.Equal(t, 3, len(rets))
+}
+
+func TestClient_TopkQuery(t *testing.T) {
+	client.FlushAll()
+	key := "test_topk_query"
+	ret, err := client.TopkReserve(key, 10, 2000, 7, 0.925)
+	assert.Nil(t, err)
+	assert.Equal(t, "OK", ret)
+	rets, err := client.TopkAdd(key, []string{"test"})
+	assert.Nil(t, err)
+	assert.NotNil(t, rets)
+	queryRet, err := client.TopkQuery(key, []string{"test", "nonexist"})
+	assert.Nil(t, err)
+	assert.Equal(t, 2, len(queryRet))
+	assert.Equal(t, int64(1), queryRet[0])
+	assert.Equal(t, int64(0), queryRet[1])
+
+	key1 := "test_topk_list"
+	ret, err = client.TopkReserve(key1, 3, 50, 3, 0.9)
+	assert.Nil(t, err)
+	assert.Equal(t, "OK", ret)
+	client.TopkAdd(key1, []string{"A", "B", "C", "D", "E", "A", "A", "B", "C",
+		"G", "D", "B", "D", "A", "E", "E"})
+	keys, err := client.TopkList(key1)
+	assert.Nil(t, err)
+	assert.Equal(t, 3, len(keys))
+	assert.Equal(t, []string{"D", "A", "B"}, keys)
+}
+
+func TestClient_TopkInfo(t *testing.T) {
+	client.FlushAll()
+	key := "test_topk_info"
+	ret, err := client.TopkReserve(key, 10, 2000, 7, 0.925)
+	assert.Nil(t, err)
+	assert.Equal(t, "OK", ret)
+
+	info, err := client.TopkInfo(key)
+	assert.Equal(t, "10", info["k"])
+	assert.Equal(t, "2000", info["width"])
+	assert.Equal(t, "7", info["depth"])
+
+	info, err = client.TopkInfo("notexists")
+	assert.NotNil(t, err)
+}
+
+func TestClient_TopkIncrBy(t *testing.T) {
+	client.FlushAll()
+	key := "test_topk_incrby"
+	ret, err := client.TopkReserve(key, 50, 2000, 7, 0.925)
+	assert.Nil(t, err)
+	assert.Equal(t, "OK", ret)
+
+	rets, err := client.TopkAdd(key, []string{"foo", "bar", "42"})
+	assert.Nil(t, err)
+	assert.NotNil(t, rets)
+
+	rets, err = client.TopkIncrBy(key, map[string]int64{"foo": 3, "bar": 2, "42": 30})
+	assert.Nil(t, err)
+	assert.Equal(t, 3, len(rets))
+	assert.Equal(t, "", rets[2])
+}
+
 func TestClient_CmsInitByDim(t *testing.T) {
 	client.FlushAll()
 	ret, err := client.CmsInitByDim("test_cms_initbydim", 1000, 5)
