@@ -2,6 +2,7 @@ package redis_bloom_go
 
 import (
 	"errors"
+	"fmt"
 	"github.com/gomodule/redigo/redis"
 	"strconv"
 	"strings"
@@ -130,4 +131,88 @@ func (client *Client) BfExistsMulti(key string, items []string) ([]int64, error)
 	args := redis.Args{key}.AddFlat(items)
 	result, err := conn.Do("BF.MEXISTS", args...)
 	return redis.Int64s(result, err)
+}
+
+// Initializes a TopK with specified parameters.
+func (client *Client) TopkReserve(key string, topk int64, width int64, depth int64, decay float64) (string, error) {
+	conn := client.Pool.Get()
+	defer conn.Close()
+	result, err := conn.Do("TOPK.RESERVE", key, topk, width, depth, strconv.FormatFloat(decay, 'g', 16, 64))
+	return redis.String(result, err)
+}
+
+// Adds an item to the data structure.
+func (client *Client) TopkAdd(key string, items []string) ([]string, error) {
+	conn := client.Pool.Get()
+	defer conn.Close()
+	args := redis.Args{key}.AddFlat(items)
+	result, err := conn.Do("TOPK.ADD", args...)
+	return redis.Strings(result, err)
+}
+
+// Returns count for an item.
+func (client *Client) TopkCount(key string, items []string) ([]string, error) {
+	conn := client.Pool.Get()
+	defer conn.Close()
+	args := redis.Args{key}.AddFlat(items)
+	result, err := conn.Do("TOPK.COUNT", args...)
+	return redis.Strings(result, err)
+}
+
+// Checks whether an item is one of Top-K items.
+func (client *Client) TopkQuery(key string, items []string) ([]int64, error) {
+	conn := client.Pool.Get()
+	defer conn.Close()
+	args := redis.Args{key}.AddFlat(items)
+	result, err := conn.Do("TOPK.QUERY", args...)
+	return redis.Int64s(result, err)
+}
+
+// Return full list of items in Top K list.
+func (client *Client) TopkList(key string) ([]string, error) {
+	conn := client.Pool.Get()
+	defer conn.Close()
+	result, err := conn.Do("TOPK.LIST", key)
+	return redis.Strings(result, err)
+}
+
+// Returns number of required items (k), width, depth and decay values.
+func (client *Client) TopkInfo(key string) (map[string]string, error) {
+	conn := client.Pool.Get()
+	defer conn.Close()
+	reply, err := conn.Do("TOPK.INFO", key)
+	values, err := redis.Values(reply, err)
+	if err != nil {
+		return nil, err
+	}
+	if len(values)%2 != 0 {
+		return nil, errors.New("expects even number of values result")
+	}
+
+	m := make(map[string]string, len(values)/2)
+	for i := 0; i < len(values); i += 2 {
+		k := values[i].(string)
+		switch v := values[i+1].(type) {
+		case []byte:
+			m[k] = string(values[i+1].([]byte))
+			break
+		case int64:
+			m[k] = strconv.FormatInt(values[i+1].(int64), 10)
+		default:
+			return nil, fmt.Errorf("unexpected element type for (Ints,String), got type %T", v)
+		}
+	}
+	return m, err
+}
+
+// Increase the score of an item in the data structure by increment.
+func (client *Client) TopkIncrBy(key string, itemIncrements map[string]int64) ([]string, error) {
+	conn := client.Pool.Get()
+	defer conn.Close()
+	args := redis.Args{key}
+	for k, v := range itemIncrements {
+		args = args.Add(k, v)
+	}
+	reply, err := conn.Do("TOPK.INCRBY", args...)
+	return redis.Strings(reply, err)
 }

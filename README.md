@@ -100,13 +100,13 @@ func main() {
 
 | Command | Recommended API and godoc  |
 | :---          |  ----: |
-| [TOPK.RESERVE](https://oss.redislabs.com/redisbloom/TopK_Commands/#topkreserve) | N/A |
-| [TOPK.ADD](https://oss.redislabs.com/redisbloom/TopK_Commands/#topkadd) |  N/A |
-| [TOPK.INCRBY](https://oss.redislabs.com/redisbloom/TopK_Commands/#topkincrby) |  N/A |
-| [TOPK.QUERY](https://oss.redislabs.com/redisbloom/TopK_Commands/#topkquery) |  N/A |
-| [TOPK.COUNT](https://oss.redislabs.com/redisbloom/TopK_Commands/#topkcount) |  N/A |
-| [TOPK.LIST](https://oss.redislabs.com/redisbloom/TopK_Commands/#topklist) |  N/A |
-| [TOPK.INFO](https://oss.redislabs.com/redisbloom/TopK_Commands/#topkinfo) |  N/A |
+| [TOPK.RESERVE](https://oss.redislabs.com/redisbloom/TopK_Commands/#topkreserve) |  [TopkReserve](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.TopkReserve)  |
+| [TOPK.ADD](https://oss.redislabs.com/redisbloom/TopK_Commands/#topkadd) |   [TopkAdd](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.TopkAdd)  |
+| [TOPK.INCRBY](https://oss.redislabs.com/redisbloom/TopK_Commands/#topkincrby) |  [TopkIncrby](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.TopkIncrby)  |
+| [TOPK.QUERY](https://oss.redislabs.com/redisbloom/TopK_Commands/#topkquery) |   [TopkQuery](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.TopkQuery)  |
+| [TOPK.COUNT](https://oss.redislabs.com/redisbloom/TopK_Commands/#topkcount) |   [TopkCount](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.TopkCount)  |
+| [TOPK.LIST](https://oss.redislabs.com/redisbloom/TopK_Commands/#topklist) |   [TopkList](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.TopkList)  |
+| [TOPK.INFO](https://oss.redislabs.com/redisbloom/TopK_Commands/#topkinfo) |   [TopkInfo](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.TopkInfo)  |
 
 
 ## License
