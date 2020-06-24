@@ -269,9 +269,119 @@ func (client *Client) CmsMerge(key string, srcs []string, weights []string) (str
 func (client *Client) CmsInfo(key string) (map[string]int64, error) {
 	conn := client.Pool.Get()
 	defer conn.Close()
-	reply, err := conn.Do("CMS.INFO", key)
+	return ParseInfoReply(redis.Values(conn.Do("CMS.INFO", key)))
+}
 
-	values, err := redis.Values(reply, err)
+// Create an empty cuckoo filter with an initial capacity of {capacity} items.
+func (client *Client) CfReserve(key string, capacity int64, bucketSize int64, maxIterations int64, expansion int64) (string, error) {
+	conn := client.Pool.Get()
+	defer conn.Close()
+	args := redis.Args{key}.Add(capacity)
+	if bucketSize > 0 {
+		args = args.Add("BUCKETSIZE", bucketSize)
+	}
+	if maxIterations > 0 {
+		args = args.Add("MAXITERATIONS", maxIterations)
+	}
+	if expansion > 0 {
+		args = args.Add("EXPANSION", expansion)
+	}
+	return redis.String(conn.Do("CF.RESERVE", args...))
+}
+
+// Adds an item to the cuckoo filter, creating the filter if it does not exist.
+func (client *Client) CfAdd(key string, item string) (bool, error) {
+	conn := client.Pool.Get()
+	defer conn.Close()
+	return redis.Bool(conn.Do("CF.ADD", key, item))
+}
+
+// Adds an item to a cuckoo filter if the item did not exist previously.
+func (client *Client) CfAddNx(key string, item string) (bool, error) {
+	conn := client.Pool.Get()
+	defer conn.Close()
+	return redis.Bool(conn.Do("CF.ADDNX", key, item))
+}
+
+// Adds one or more items to a cuckoo filter, allowing the filter to be created with a custom capacity if it does not yet exist.
+func (client *Client) CfInsert(key string, cap int64, noCreate bool, items []string) ([]int64, error) {
+	conn := client.Pool.Get()
+	defer conn.Close()
+	args := GetInsertArgs(key, cap, noCreate, items)
+	return redis.Int64s(conn.Do("CF.INSERT", args...))
+}
+
+// Adds one or more items to a cuckoo filter, allowing the filter to be created with a custom capacity if it does not yet exist.
+func (client *Client) CfInsertNx(key string, cap int64, noCreate bool, items []string) ([]int64, error) {
+	conn := client.Pool.Get()
+	defer conn.Close()
+	args := GetInsertArgs(key, cap, noCreate, items)
+	return redis.Int64s(conn.Do("CF.INSERTNX", args...))
+}
+
+func GetInsertArgs(key string, cap int64, noCreate bool, items []string) redis.Args {
+	args := redis.Args{key}
+	if cap > 0 {
+		args = args.Add("CAPACITY", cap)
+	}
+	if noCreate {
+		args = args.Add("NOCREATE")
+	}
+	args = args.Add("ITEMS").AddFlat(items)
+	return args
+}
+
+// Check if an item exists in a Cuckoo Filter
+func (client *Client) CfExists(key string, item string) (bool, error) {
+	conn := client.Pool.Get()
+	defer conn.Close()
+	return redis.Bool(conn.Do("CF.EXISTS", key, item))
+}
+
+// Deletes an item once from the filter.
+func (client *Client) CfDel(key string, item string) (bool, error) {
+	conn := client.Pool.Get()
+	defer conn.Close()
+	return redis.Bool(conn.Do("CF.DEL", key, item))
+}
+
+// Returns the number of times an item may be in the filter.
+func (client *Client) CfCount(key string, item string) (int64, error) {
+	conn := client.Pool.Get()
+	defer conn.Close()
+	return redis.Int64(conn.Do("CF.COUNT", key, item))
+}
+
+// Begins an incremental save of the cuckoo filter.
+func (client *Client) CfScanDump(key string, iter int64) (int64, []byte, error) {
+	conn := client.Pool.Get()
+	defer conn.Close()
+	reply, err := redis.Values(conn.Do("CF.SCANDUMP", key, iter))
+	if err != nil || len(reply) != 2 {
+		return 0, nil, err
+	}
+	iter = reply[0].(int64)
+	if reply[1] == nil {
+		return iter, nil, err
+	}
+	return iter, reply[1].([]byte), err
+}
+
+// Restores a filter previously saved using SCANDUMP
+func (client *Client) CfLoadChunk(key string, iter int64, data []byte) (string, error) {
+	conn := client.Pool.Get()
+	defer conn.Close()
+	return redis.String(conn.Do("CF.LOADCHUNK", key, iter, data))
+}
+
+// Return information about key
+func (client *Client) CfInfo(key string) (map[string]int64, error) {
+	conn := client.Pool.Get()
+	defer conn.Close()
+	return ParseInfoReply(redis.Values(conn.Do("CF.INFO", key)))
+}
+
+func ParseInfoReply(values []interface{}, err error) (map[string]int64, error) {
 	if err != nil {
 		return nil, err
 	}

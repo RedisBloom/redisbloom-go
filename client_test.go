@@ -280,3 +280,117 @@ func TestClient_CmsInfo(t *testing.T) {
 	assert.Equal(t, int64(5), info["depth"])
 	assert.Equal(t, int64(0), info["count"])
 }
+
+func TestClient_CfReserve(t *testing.T) {
+	client.FlushAll()
+	key := "test_cf_reserve"
+	ret, err := client.CfReserve(key, 1000, -1, -1, -1)
+	assert.Nil(t, err)
+	assert.Equal(t, "OK", ret)
+}
+
+func TestClient_CfAdd(t *testing.T) {
+	client.FlushAll()
+	key := "test_cf_add"
+	ret, err := client.CfAdd(key, "a")
+	assert.Nil(t, err)
+	assert.True(t, ret)
+	ret, err = client.CfAddNx(key, "b")
+	assert.Nil(t, err)
+	assert.True(t, ret)
+}
+
+func TestClient_CfInsert(t *testing.T) {
+	client.FlushAll()
+	key := "test_cf_insert"
+	ret, err := client.CfInsert(key, 1000, false, []string{"a"})
+	assert.Nil(t, err)
+	assert.Equal(t, 1, len(ret))
+	assert.True(t, ret[0] > 0)
+	ret, err = client.CfInsertNx(key, 1000, true, []string{"b"})
+	assert.Nil(t, err)
+	assert.Equal(t, 1, len(ret))
+	assert.True(t, ret[0] > 0)
+}
+
+func TestClient_CfExists(t *testing.T) {
+	client.FlushAll()
+	key := "test_cf_exists"
+	ret, err := client.CfAdd(key, "a")
+	assert.Nil(t, err)
+	assert.True(t, ret)
+	ret, err = client.CfExists(key, "a")
+	assert.Nil(t, err)
+	assert.True(t, ret)
+}
+
+func TestClient_CfDel(t *testing.T) {
+	client.FlushAll()
+	key := "test_cf_del"
+	ret, err := client.CfAdd(key, "a")
+	assert.Nil(t, err)
+	assert.True(t, ret)
+	ret, err = client.CfExists(key, "a")
+	assert.Nil(t, err)
+	assert.True(t, ret)
+	ret, err = client.CfDel(key, "a")
+	assert.Nil(t, err)
+	assert.True(t, ret)
+	ret, err = client.CfExists(key, "a")
+	assert.Nil(t, err)
+	assert.False(t, ret)
+}
+
+func TestClient_CfCount(t *testing.T) {
+	client.FlushAll()
+	key := "test_cf_count"
+	ret, err := client.CfAdd(key, "a")
+	assert.Nil(t, err)
+	assert.True(t, ret)
+	count, err := client.CfCount(key, "a")
+	assert.Nil(t, err)
+	assert.Equal(t, int64(1), count)
+}
+
+func TestClient_CfScanDump(t *testing.T) {
+	client.FlushAll()
+	key := "test_cf_scandump"
+	ret, err := client.CfReserve(key, 100, 50, -1, -1)
+	assert.Nil(t, err)
+	assert.Equal(t, "OK", ret)
+	client.CfAdd(key, "a")
+	curIter := int64(0)
+	chunks := make([]map[string]interface{}, 0)
+	for {
+		iter, data, err := client.CfScanDump(key, curIter)
+		assert.Nil(t, err)
+		curIter = iter
+		if iter == int64(0) {
+			break
+		}
+		chunk := map[string]interface{}{"iter": iter, "data": data}
+		chunks = append(chunks, chunk)
+	}
+	client.FlushAll()
+	for i := 0; i < len(chunks); i++ {
+		ret, err := client.CfLoadChunk(key, chunks[i]["iter"].(int64), chunks[i]["data"].([]byte))
+		assert.Nil(t, err)
+		assert.Equal(t, "OK", ret)
+	}
+	exists, err := client.CfExists(key, "a")
+	assert.True(t, exists)
+}
+
+func TestClient_CfInfo(t *testing.T) {
+	client.FlushAll()
+	key := "test_cf_info"
+	ret, err := client.CfAdd(key, "a")
+	assert.Nil(t, err)
+	assert.True(t, ret)
+	info, err := client.CfInfo(key)
+	assert.Equal(t, int64(1080), info["Size"])
+	assert.Equal(t, int64(512), info["Number of buckets"])
+	assert.Equal(t, int64(0), info["Number of filter"])
+	assert.Equal(t, int64(1), info["Number of items inserted"])
+	assert.Equal(t, int64(0), info["Max iteration"])
+}

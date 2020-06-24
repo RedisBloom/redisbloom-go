@@ -73,17 +73,17 @@ func main() {
 
 | Command | Recommended API and godoc  |
 | :---          |  ----: |
-| [CF.RESERVE](https://oss.redislabs.com/redisbloom/Cuckoo_Commands/#cfreserve) | N/A |
-| [CF.ADD](https://oss.redislabs.com/redisbloom/Cuckoo_Commands/#cfadd) |  N/A |
-| [CF.ADDNX](https://oss.redislabs.com/redisbloom/Cuckoo_Commands/#cfaddnx) |  N/A |
-| [CF.INSERT](https://oss.redislabs.com/redisbloom/Cuckoo_Commands/#cfinsert) |  N/A |
-| [CF.INSERTNX](https://oss.redislabs.com/redisbloom/Cuckoo_Commands/#cfinsertnx) |  N/A |
-| [CF.EXISTS](https://oss.redislabs.com/redisbloom/Cuckoo_Commands/#cfexists) |  N/A |
-| [CF.DEL](https://oss.redislabs.com/redisbloom/Cuckoo_Commands/#cfdel) |  N/A |
-| [CF.COUNT](https://oss.redislabs.com/redisbloom/Cuckoo_Commands/#cfcount) |  N/A |
-| [CF.SCANDUMP](https://oss.redislabs.com/redisbloom/Cuckoo_Commands/#cfscandump) |  N/A |
-| [CF.LOADCHUNK](https://oss.redislabs.com/redisbloom/Cuckoo_Commands/#cfloadchunck) |  N/A |
-| [CF.INFO](https://oss.redislabs.com/redisbloom/Cuckoo_Commands/#cfinfo) |  N/A |
+| [CF.RESERVE](https://oss.redislabs.com/redisbloom/Cuckoo_Commands/#cfreserve) | [CfReserve](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.CfReserve) |
+| [CF.ADD](https://oss.redislabs.com/redisbloom/Cuckoo_Commands/#cfadd) |  [CfAdd](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.CfAdd) |
+| [CF.ADDNX](https://oss.redislabs.com/redisbloom/Cuckoo_Commands/#cfaddnx) |  [CfAddNx](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.CfAddNx) |
+| [CF.INSERT](https://oss.redislabs.com/redisbloom/Cuckoo_Commands/#cfinsert) |  [CfInsert](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.CfInsert) |
+| [CF.INSERTNX](https://oss.redislabs.com/redisbloom/Cuckoo_Commands/#cfinsertnx) |  [CfInsertNx](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.CfInsertNx) |
+| [CF.EXISTS](https://oss.redislabs.com/redisbloom/Cuckoo_Commands/#cfexists) |  [CfExists](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.CfExists) |
+| [CF.DEL](https://oss.redislabs.com/redisbloom/Cuckoo_Commands/#cfdel) |  [CfDel](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.CfDel) |
+| [CF.COUNT](https://oss.redislabs.com/redisbloom/Cuckoo_Commands/#cfcount) |  [CfCount](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.CfCount) |
+| [CF.SCANDUMP](https://oss.redislabs.com/redisbloom/Cuckoo_Commands/#cfscandump) | [CfScanDump](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.CfScanDump) |
+| [CF.LOADCHUNK](https://oss.redislabs.com/redisbloom/Cuckoo_Commands/#cfloadchunck) |  [CfLoadChunk](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.CfLoadChunk) |
+| [CF.INFO](https://oss.redislabs.com/redisbloom/Cuckoo_Commands/#cfinfo) |  [CfInfo](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.CfInfo) |
 
 ### Count-Min Sketch
 
