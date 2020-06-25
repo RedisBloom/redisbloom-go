@@ -65,8 +65,8 @@ func main() {
 | [BF.INSERT](https://oss.redislabs.com/redisbloom/Bloom_Commands/#bfinsert) | N/A |
 | [BF.EXISTS](https://oss.redislabs.com/redisbloom/Bloom_Commands/#bfexists) | [Exists](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.Exists) |
 | [BF.MEXISTS](https://oss.redislabs.com/redisbloom/Bloom_Commands/#bfmexists) | [BfExistsMulti](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.BfExistsMulti) |
-| [BF.SCANDUMP](https://oss.redislabs.com/redisbloom/Bloom_Commands/#bfscandump) | N/A |
-| [BF.LOADCHUNK](https://oss.redislabs.com/redisbloom/Bloom_Commands/#bfloadchunk) | N/A |
+| [BF.SCANDUMP](https://oss.redislabs.com/redisbloom/Bloom_Commands/#bfscandump) | [BfScanDump](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.BfScanDump) |
+| [BF.LOADCHUNK](https://oss.redislabs.com/redisbloom/Bloom_Commands/#bfloadchunk) | [BfLoadChunk](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.BfLoadChunk) |
 | [BF.INFO](https://oss.redislabs.com/redisbloom/Bloom_Commands/#bfinfo) | [Info](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.Info) |
 
 ### Cuckoo Filter

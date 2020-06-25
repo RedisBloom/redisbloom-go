@@ -394,3 +394,31 @@ func TestClient_CfInfo(t *testing.T) {
 	assert.Equal(t, int64(1), info["Number of items inserted"])
 	assert.Equal(t, int64(0), info["Max iteration"])
 }
+
+func TestClient_BfScanDump(t *testing.T) {
+	client.FlushAll()
+	key := "test_bf_scandump"
+	err := client.Reserve(key, 0.01, 1000)
+	assert.Nil(t, err)
+	client.Add(key, "1")
+	curIter := int64(0)
+	chunks := make([]map[string]interface{}, 0)
+	for {
+		iter, data, err := client.BfScanDump(key, curIter)
+		assert.Nil(t, err)
+		curIter = iter
+		if iter == int64(0) {
+			break
+		}
+		chunk := map[string]interface{}{"iter": iter, "data": data}
+		chunks = append(chunks, chunk)
+	}
+	client.FlushAll()
+	for i := 0; i < len(chunks); i++ {
+		ret, err := client.BfLoadChunk(key, chunks[i]["iter"].(int64), chunks[i]["data"].([]byte))
+		assert.Nil(t, err)
+		assert.Equal(t, "OK", ret)
+	}
+	exists, err := client.Exists(key, "1")
+	assert.True(t, exists)
+}

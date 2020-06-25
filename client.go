@@ -133,6 +133,28 @@ func (client *Client) BfExistsMulti(key string, items []string) ([]int64, error)
 	return redis.Int64s(result, err)
 }
 
+// Begins an incremental save of the bloom filter.
+func (client *Client) BfScanDump(key string, iter int64) (int64, []byte, error) {
+	conn := client.Pool.Get()
+	defer conn.Close()
+	reply, err := redis.Values(conn.Do("BF.SCANDUMP", key, iter))
+	if err != nil || len(reply) != 2 {
+		return 0, nil, err
+	}
+	iter = reply[0].(int64)
+	if reply[1] == nil {
+		return iter, nil, err
+	}
+	return iter, reply[1].([]byte), err
+}
+
+// Restores a filter previously saved using SCANDUMP .
+func (client *Client) BfLoadChunk(key string, iter int64, data []byte) (string, error) {
+	conn := client.Pool.Get()
+	defer conn.Close()
+	return redis.String(conn.Do("BF.LOADCHUNK", key, iter, data))
+}
+
 // Initializes a TopK with specified parameters.
 func (client *Client) TopkReserve(key string, topk int64, width int64, depth int64, decay float64) (string, error) {
 	conn := client.Pool.Get()
