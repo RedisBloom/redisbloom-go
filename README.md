@@ -62,7 +62,7 @@ func main() {
 | [BF.RESERVE](https://oss.redislabs.com/redisbloom/Bloom_Commands/#bfreserve) | [Reserve](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.Reserve) |
 | [BF.ADD](https://oss.redislabs.com/redisbloom/Bloom_Commands/#bfadd) | [Add](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.Add) |
 | [BF.MADD](https://oss.redislabs.com/redisbloom/Bloom_Commands/#bfmadd) | [BfAddMulti](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.BfAddMulti)  |
-| [BF.INSERT](https://oss.redislabs.com/redisbloom/Bloom_Commands/#bfinsert) | N/A |
+| [BF.INSERT](https://oss.redislabs.com/redisbloom/Bloom_Commands/#bfinsert) | [BfInsert](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.BfInsert) |
 | [BF.EXISTS](https://oss.redislabs.com/redisbloom/Bloom_Commands/#bfexists) | [Exists](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.Exists) |
 | [BF.MEXISTS](https://oss.redislabs.com/redisbloom/Bloom_Commands/#bfmexists) | [BfExistsMulti](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.BfExistsMulti) |
 | [BF.SCANDUMP](https://oss.redislabs.com/redisbloom/Bloom_Commands/#bfscandump) | [BfScanDump](https://godoc.org/github.com/RedisBloom/redisbloom-go#Client.BfScanDump) |
