@@ -156,7 +156,7 @@ func (client *Client) BfLoadChunk(key string, iter int64, data []byte) (string, 
 }
 
 // This command will add one or more items to the bloom filter, by default creating it if it does not yet exist.
-func (client *Client) BfInsert(key string, cap int64, errorRatio float64, expansion int64, noCreate bool, nonScaling bool, items []string) ([]int64, error) {
+func (client *Client) BfInsert(key string, cap int64, errorRatio float64, expansion int64, noCreate bool, nonScaling bool, items []string) (res []int64, err error) {
 	conn := client.Pool.Get()
 	defer conn.Close()
 	args := redis.Args{key}
@@ -176,7 +176,21 @@ func (client *Client) BfInsert(key string, cap int64, errorRatio float64, expans
 		args = args.Add("NONSCALING")
 	}
 	args = args.Add("ITEMS").AddFlat(items)
-	return redis.Int64s(conn.Do("BF.INSERT", args...))
+	var resp []interface{}
+	var innerRes int64
+	resp, err = redis.Values(conn.Do("BF.INSERT", args...))
+	if err != nil {
+		return
+	}
+	for _, arrayPos := range resp {
+		innerRes, err = redis.Int64(arrayPos, err)
+		if err == nil {
+			res = append(res, innerRes)
+		} else {
+			break
+		}
+	}
+	return
 }
 
 // Initializes a TopK with specified parameters.

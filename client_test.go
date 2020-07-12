@@ -133,6 +133,9 @@ func TestClient_BfExistsMulti(t *testing.T) {
 func TestClient_BfInsert(t *testing.T) {
 	client.FlushAll()
 	key := "test_bf_insert"
+	key_nocreate := "test_bf_insert_nocreate"
+	key_noscaling := "test_bf_insert_noscaling"
+
 	ret, err := client.BfInsert(key, 1000, 0.1, -1, false, false, []string{"a"})
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(ret))
@@ -141,6 +144,23 @@ func TestClient_BfInsert(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(existsResult))
 	assert.Equal(t, int64(1), existsResult[0])
+
+	ret, err = client.BfInsert(key, 1000, 0.1, -1, false, false, []string{"a", "b"})
+	assert.Nil(t, err)
+	assert.Equal(t, 2, len(ret))
+
+	// Test for NOCREATE : If specified, indicates that the filter should not be created if it does not already exist
+	_, err = client.BfInsert(key_nocreate, 1000, 0.1, -1, true, false, []string{"a"})
+	assert.NotNil(t, err)
+
+	// Test NONSCALING : Prevents the filter from creating additional sub-filters if initial capacity is reached.
+	ret, err = client.BfInsert(key_noscaling, 2, 0.1, -1, false, true, []string{"a", "b"})
+	assert.Nil(t, err)
+	assert.Equal(t, 2, len(ret))
+	ret, err = client.BfInsert(key_noscaling, 2, 0.1, -1, false, true, []string{"c"})
+	assert.NotNil(t, err)
+	assert.Equal(t, 0, len(ret))
+	assert.Equal(t, err.Error(), "ERR non scaling filter is full")
 }
 
 func TestClient_TopkReserve(t *testing.T) {
