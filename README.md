@@ -4,7 +4,6 @@
 [![Codecov](https://codecov.io/gh/RedisBloom/redisbloom-go/branch/master/graph/badge.svg)](https://codecov.io/gh/RedisBloom/redisbloom-go)
 [![GoDoc](https://godoc.org/github.com/RedisBloom/redisbloom-go?status.svg)](https://godoc.org/github.com/RedisBloom/redisbloom-go)
 
-
 # redisbloom-go
 
 Go client for RedisBloom (https://github.com/RedisBloom/redisbloom), based on redigo.
@@ -20,10 +19,13 @@ $ go get github.com/RedisBloom/redisbloom-go
 A simple test suite is provided, and can be run with:
 
 ```sh
-$ RedisBloom_TEST_PASSWORD="" go test
+$ go test
 ```
 
-The tests expect a Redis server with the RedisBloom module loaded to be available at localhost:6379
+The tests expect a Redis server with the RedisBloom module loaded to be available at localhost:6379. You can easily launch RedisBloom with Docker in the following manner:
+```
+docker run -d -p 6379:6379 --name redis-redisbloom redislabs/rebloom:latest 
+```
 
 ## Example Code
 
