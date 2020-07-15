@@ -155,6 +155,44 @@ func (client *Client) BfLoadChunk(key string, iter int64, data []byte) (string, 
 	return redis.String(conn.Do("BF.LOADCHUNK", key, iter, data))
 }
 
+// This command will add one or more items to the bloom filter, by default creating it if it does not yet exist.
+func (client *Client) BfInsert(key string, cap int64, errorRatio float64, expansion int64, noCreate bool, nonScaling bool, items []string) (res []int64, err error) {
+	conn := client.Pool.Get()
+	defer conn.Close()
+	args := redis.Args{key}
+	if cap > 0 {
+		args = args.Add("CAPACITY", cap)
+	}
+	if errorRatio > 0 {
+		args = args.Add("ERROR", errorRatio)
+	}
+	if expansion > 0 {
+		args = args.Add("EXPANSION", expansion)
+	}
+	if noCreate {
+		args = args.Add("NOCREATE")
+	}
+	if nonScaling {
+		args = args.Add("NONSCALING")
+	}
+	args = args.Add("ITEMS").AddFlat(items)
+	var resp []interface{}
+	var innerRes int64
+	resp, err = redis.Values(conn.Do("BF.INSERT", args...))
+	if err != nil {
+		return
+	}
+	for _, arrayPos := range resp {
+		innerRes, err = redis.Int64(arrayPos, err)
+		if err == nil {
+			res = append(res, innerRes)
+		} else {
+			break
+		}
+	}
+	return
+}
+
 // Initializes a TopK with specified parameters.
 func (client *Client) TopkReserve(key string, topk int64, width int64, depth int64, decay float64) (string, error) {
 	conn := client.Pool.Get()
