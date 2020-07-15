@@ -350,7 +350,7 @@ func TestClient_CmsMerge(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, "OK", ret)
 	results, err = client.CmsQuery("E", []string{"foo", "bar", "baz"})
-	assert.Equal(t, []int64{5+2*5, 3+3*5, 9+1*5}, results)
+	assert.Equal(t, []int64{5 + 2*5, 3 + 3*5, 9 + 1*5}, results)
 }
 
 func TestClient_CmsInfo(t *testing.T) {
