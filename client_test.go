@@ -133,6 +133,7 @@ func TestClient_BfExistsMulti(t *testing.T) {
 func TestClient_BfInsert(t *testing.T) {
 	client.FlushAll()
 	key := "test_bf_insert"
+	key_expansion := "test_bf_insert_expansion"
 	key_nocreate := "test_bf_insert_nocreate"
 	key_noscaling := "test_bf_insert_noscaling"
 
@@ -148,6 +149,11 @@ func TestClient_BfInsert(t *testing.T) {
 	ret, err = client.BfInsert(key, 1000, 0.1, -1, false, false, []string{"a", "b"})
 	assert.Nil(t, err)
 	assert.Equal(t, 2, len(ret))
+
+	// Test for EXPANSION : If a new sub-filter is created, its size will be the size of the current filter multiplied by expansion
+	ret, err = client.BfInsert(key_expansion, 1000, 0.1, 4, false, false, []string{"a"})
+	assert.Nil(t, err)
+	assert.Equal(t, 1, len(ret))
 
 	// Test for NOCREATE : If specified, indicates that the filter should not be created if it does not already exist
 	_, err = client.BfInsert(key_nocreate, 1000, 0.1, -1, true, false, []string{"a"})
@@ -179,6 +185,22 @@ func TestClient_TopkAdd(t *testing.T) {
 	rets, err := client.TopkAdd(key, []string{"test", "test1", "test3"})
 	assert.Nil(t, err)
 	assert.Equal(t, 3, len(rets))
+}
+
+func TestClient_TopkCount(t *testing.T) {
+	client.FlushAll()
+	key := "test_topk_count"
+	ret, err := client.TopkReserve(key, 10, 2000, 7, 0.925)
+	assert.Nil(t, err)
+	assert.Equal(t, "OK", ret)
+	rets, err := client.TopkAdd(key, []string{"test", "test1", "test3"})
+	assert.Nil(t, err)
+	assert.Equal(t, 3, len(rets))
+	counts, err := client.TopkCount(key, []string{"test", "test1", "test3"})
+	assert.Equal(t, 3, len(counts))
+	for _, element := range counts {
+		assert.LessOrEqual(t, int64(1), element)
+	}
 }
 
 func TestClient_TopkQuery(t *testing.T) {
@@ -294,11 +316,41 @@ func TestClient_CmsMerge(t *testing.T) {
 	ret, err = client.CmsInitByDim("C", 1000, 5)
 	assert.Nil(t, err)
 	assert.Equal(t, "OK", ret)
+	ret, err = client.CmsInitByDim("D", 1000, 5)
+	assert.Nil(t, err)
+	assert.Equal(t, "OK", ret)
+	ret, err = client.CmsInitByDim("E", 1000, 5)
+	assert.Nil(t, err)
+	assert.Equal(t, "OK", ret)
+
 	client.CmsIncrBy("A", map[string]int64{"foo": 5, "bar": 3, "baz": 9})
 	client.CmsIncrBy("B", map[string]int64{"foo": 2, "bar": 3, "baz": 1})
-	client.CmsMerge("C", []string{"A", "B"}, nil)
+
+	// Negative test ( key not exist )
+	ret, err = client.CmsMerge("dont_exist", []string{"A", "B"}, nil)
+	assert.NotNil(t, err)
+	assert.Equal(t, "CMS: key does not exist", err.Error())
+
+	// Positive tests
+	ret, err = client.CmsMerge("C", []string{"A", "B"}, nil)
+	assert.Nil(t, err)
+	assert.Equal(t, "OK", ret)
 	results, err := client.CmsQuery("C", []string{"foo", "bar", "baz"})
 	assert.Equal(t, []int64{7, 6, 10}, results)
+
+	// Test for WEIGHTS ( default weight )
+	ret, err = client.CmsMerge("D", []string{"A", "B"}, []int64{1, 1, 1})
+	assert.Nil(t, err)
+	assert.Equal(t, "OK", ret)
+	results, err = client.CmsQuery("D", []string{"foo", "bar", "baz"})
+	assert.Equal(t, []int64{7, 6, 10}, results)
+
+	// Test for WEIGHTS ( default weight )
+	ret, err = client.CmsMerge("E", []string{"A", "B"}, []int64{1, 5})
+	assert.Nil(t, err)
+	assert.Equal(t, "OK", ret)
+	results, err = client.CmsQuery("E", []string{"foo", "bar", "baz"})
+	assert.Equal(t, []int64{5 + 2*5, 3 + 3*5, 9 + 1*5}, results)
 }
 
 func TestClient_CmsInfo(t *testing.T) {
@@ -317,7 +369,19 @@ func TestClient_CmsInfo(t *testing.T) {
 func TestClient_CfReserve(t *testing.T) {
 	client.FlushAll()
 	key := "test_cf_reserve"
+	key_max_iterations := "test_cf_reserve_maxiterations"
+	key_expansion := "test_cf_reserve_expansion"
 	ret, err := client.CfReserve(key, 1000, -1, -1, -1)
+	assert.Nil(t, err)
+	assert.Equal(t, "OK", ret)
+
+	// Test for MAXITERATIONS property
+	ret, err = client.CfReserve(key_max_iterations, 1000, -1, 20, -1)
+	assert.Nil(t, err)
+	assert.Equal(t, "OK", ret)
+
+	// Test for EXPANSION property
+	ret, err = client.CfReserve(key_expansion, 1000, -1, -1, 2)
 	assert.Nil(t, err)
 	assert.Equal(t, "OK", ret)
 }
@@ -454,4 +518,14 @@ func TestClient_BfScanDump(t *testing.T) {
 	}
 	exists, err := client.Exists(key, "1")
 	assert.True(t, exists)
+
+	// Negative testing
+	notBfKey := "string_key"
+	conn := client.Pool.Get()
+	defer conn.Close()
+	_, err = conn.Do("SET", redis.Args{notBfKey, "value"}...)
+	assert.Nil(t, err)
+	_, _, err = client.BfScanDump(notBfKey, 0)
+	assert.Equal(t, err.Error(), "WRONGTYPE Operation against a key holding the wrong kind of value")
+
 }

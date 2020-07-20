@@ -211,12 +211,12 @@ func (client *Client) TopkAdd(key string, items []string) ([]string, error) {
 }
 
 // Returns count for an item.
-func (client *Client) TopkCount(key string, items []string) ([]string, error) {
+func (client *Client) TopkCount(key string, items []string) (result []int64, err error) {
 	conn := client.Pool.Get()
 	defer conn.Close()
 	args := redis.Args{key}.AddFlat(items)
-	result, err := conn.Do("TOPK.COUNT", args...)
-	return redis.Strings(result, err)
+	result, err = redis.Int64s(conn.Do("TOPK.COUNT", args...))
+	return
 }
 
 // Checks whether an item is one of Top-K items.
@@ -314,11 +314,12 @@ func (client *Client) CmsQuery(key string, items []string) ([]int64, error) {
 	return redis.Int64s(result, err)
 }
 
-// Merges several sketches into one sketch.
-func (client *Client) CmsMerge(key string, srcs []string, weights []string) (string, error) {
+// Merges several sketches into one sketch, stored at dest key
+// All sketches must have identical width and depth.
+func (client *Client) CmsMerge(dest string, srcs []string, weights []int64) (string, error) {
 	conn := client.Pool.Get()
 	defer conn.Close()
-	args := redis.Args{key}.Add(len(srcs)).AddFlat(srcs)
+	args := redis.Args{dest}.Add(len(srcs)).AddFlat(srcs)
 	if weights != nil && len(weights) > 0 {
 		args = args.Add("WEIGHTS").AddFlat(weights)
 	}
