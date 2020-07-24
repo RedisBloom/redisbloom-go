@@ -19,11 +19,24 @@ jobs:
       - run: make coverage
       - run: bash <(curl -s https://codecov.io/bash) -t ${CODECOV_TOKEN}
 
+  build-latest:
+    docker:
+      # specify the version
+      - image: circleci/golang:1.12
+
+      - image: redislabs/rebloom:latest
+        port: 6379:6379
+
+    working_directory: /go/src/github.com/RedisBloom/redisbloom-go
+    steps:
+      - checkout
+      - run: make test
 workflows:
   version: 2
   commit:
     jobs:
       - build
+      - build-latest
   nightly:
     triggers:
       - schedule:
@@ -34,3 +47,4 @@ workflows:
                 - master
     jobs:
       - build
+      - build-latest
