@@ -84,9 +84,9 @@ func (p *MultiHostPool) Get() redis.Conn {
 	return pool.Get()
 }
 
-func dialFuncWrapper(host string, authPass *string) func() (redis.Conn, error) {
+func dialFuncWrapper(host string, authPass *string, options ...redis.DialOption) func() (redis.Conn, error) {
 	return func() (redis.Conn, error) {
-		conn, err := redis.Dial("tcp", host)
+		conn, err := redis.Dial("tcp", host, options...)
 		if err != nil {
 			return conn, err
 		}
