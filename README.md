@@ -5,6 +5,8 @@
 [![GoDoc](https://godoc.org/github.com/RedisBloom/redisbloom-go?status.svg)](https://godoc.org/github.com/RedisBloom/redisbloom-go)
 
 # redisbloom-go
+[![Forum](https://img.shields.io/badge/Forum-RedisBloom-blue)](https://forum.redislabs.com/c/modules/redisbloom)
+[![Discord](https://img.shields.io/discord/697882427875393627?style=flat-square)](https://discord.gg/wXhwjCQ)
 
 Go client for RedisBloom (https://github.com/RedisBloom/redisbloom), based on redigo.
 
