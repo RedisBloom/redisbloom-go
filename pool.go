@@ -98,7 +98,7 @@ func dialFuncWrapper(host string, authPass *string) func() (redis.Conn, error) {
 }
 
 func testOnBorrow(c redis.Conn, t time.Time) (err error) {
-	if time.Since(t) > time.Millisecond {
+	if time.Since(t) > time.Minute {
 		_, err = c.Do("PING")
 	}
 	return err
