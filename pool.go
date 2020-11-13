@@ -101,5 +101,5 @@ func testOnBorrow(c redis.Conn, t time.Time) (err error) {
 	if time.Since(t) > time.Minute {
 		_, err = c.Do("PING")
 	}
-	return err
+	return
 }
