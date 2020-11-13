@@ -23,9 +23,9 @@ type SingleHostPool struct {
 //	s.Pool.Close()
 //}
 
-func NewSingleHostPool(host string, authPass *string) *SingleHostPool {
+func NewSingleHostPool(host string, authPass *string, options ...redis.DialOption) *SingleHostPool {
 	ret := &redis.Pool{
-		Dial:         dialFuncWrapper(host, authPass),
+		Dial:         dialFuncWrapper(host, authPass, options...),
 		TestOnBorrow: testOnBorrow,
 		MaxIdle:      maxConns,
 	}
@@ -38,6 +38,7 @@ type MultiHostPool struct {
 	pools    map[string]*redis.Pool
 	hosts    []string
 	authPass *string
+	options  []redis.DialOption
 }
 
 func (p *MultiHostPool) Close() (err error) {
@@ -57,11 +58,12 @@ func (p *MultiHostPool) Close() (err error) {
 	return
 }
 
-func NewMultiHostPool(hosts []string, authPass *string) *MultiHostPool {
+func NewMultiHostPool(hosts []string, authPass *string, options ...redis.DialOption) *MultiHostPool {
 	return &MultiHostPool{
 		pools:    make(map[string]*redis.Pool, len(hosts)),
 		hosts:    hosts,
 		authPass: authPass,
+		options:  options,
 	}
 }
 
@@ -74,7 +76,7 @@ func (p *MultiHostPool) Get() redis.Conn {
 
 	if !found {
 		pool = &redis.Pool{
-			Dial:         dialFuncWrapper(host, p.authPass),
+			Dial:         dialFuncWrapper(host, p.authPass, p.options...),
 			TestOnBorrow: testOnBorrow,
 			MaxIdle:      maxConns,
 		}
@@ -84,9 +86,9 @@ func (p *MultiHostPool) Get() redis.Conn {
 	return pool.Get()
 }
 
-func dialFuncWrapper(host string, authPass *string) func() (redis.Conn, error) {
+func dialFuncWrapper(host string, authPass *string, options ...redis.DialOption) func() (redis.Conn, error) {
 	return func() (redis.Conn, error) {
-		conn, err := redis.Dial("tcp", host)
+		conn, err := redis.Dial("tcp", host, options...)
 		if err != nil {
 			return conn, err
 		}
