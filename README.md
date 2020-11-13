@@ -2,7 +2,7 @@
 [![CircleCI](https://circleci.com/gh/RedisBloom/redisbloom-go.svg?style=svg)](https://circleci.com/gh/RedisBloom/redisbloom-go)
 [![GitHub issues](https://img.shields.io/github/release/RedisBloom/redisbloom-go.svg)](https://github.com/RedisBloom/redisbloom-go/releases/latest)
 [![Codecov](https://codecov.io/gh/RedisBloom/redisbloom-go/branch/master/graph/badge.svg)](https://codecov.io/gh/RedisBloom/redisbloom-go)
-[![GoDoc](https://godoc.org/github.com/RedisBloom/redisbloom-go?status.svg)](https://godoc.org/github.com/RedisBloom/redisbloom-go)
+[![GoDoc](https://godoc.org/github.com/RedisBloom/redisbloom-go?status.svg)](https://pkg.go.dev/github.com/RedisBloom/redisbloom-go)
 [![Go Report Card](https://goreportcard.com/badge/github.com/RedisBloom/redisbloom-go)](https://goreportcard.com/report/github.com/RedisBloom/redisbloom-go)
 
 # redisbloom-go
@@ -32,6 +32,8 @@ docker run -d -p 6379:6379 --name redis-redisbloom redislabs/rebloom:latest
 
 ## Example Code
 
+Make sure to check the full list of examples at [Pkg.go.dev](https://pkg.go.dev/github.com/RedisBloom/redisbloom-go#pkg-examples).
+
 ```go
 package main 
 
@@ -59,6 +61,8 @@ func main() {
 ```
 
 ## Supported RedisBloom Commands
+
+Make sure to check the full command reference at [redisbloom.io](https://redisbloom.io).
 
 ### Bloom Filter
 

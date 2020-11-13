@@ -12,7 +12,7 @@ import (
 // Client Max Connections
 var maxConns = 500
 
-// Client is an interface to time series redis commands
+// Client is an interface to RedisBloom redis commands
 type Client struct {
 	Pool ConnPool
 	Name string
@@ -21,6 +21,7 @@ type Client struct {
 // NewClient creates a new client connecting to the redis host, and using the given name as key prefix.
 // Addr can be a single host:port pair, or a comma separated list of host:port,host:port...
 // In the case of multiple hosts we create a multi-pool and select connections at random
+// Deprecated: Please use NewClientFromPool() instead
 func NewClient(addr, name string, authPass *string) *Client {
 	addrs := strings.Split(addr, ",")
 	var pool ConnPool
