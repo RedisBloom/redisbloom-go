@@ -443,22 +443,22 @@ func (client *Client) CfInfo(key string) (map[string]int64, error) {
 	return ParseInfoReply(redis.Values(conn.Do("CF.INFO", key)))
 }
 
-// Allocate the memory and initialize the t-digest
-func (client *Client) TdCreate(key string, compression int64) (string, error){
+// TdCreate - Allocate the memory and initialize the t-digest
+func (client *Client) TdCreate(key string, compression int64) (string, error) {
 	conn := client.Pool.Get()
 	defer conn.Close()
 	return redis.String(conn.Do("TDIGEST.CREATE", key, compression))
 }
 
-// Reset the sketch to zero - empty out the sketch and re-initialize it
-func (client *Client) TdReset(key string) (string, error){
+// TdReset - Reset the sketch to zero - empty out the sketch and re-initialize it
+func (client *Client) TdReset(key string) (string, error) {
 	conn := client.Pool.Get()
 	defer conn.Close()
 	return redis.String(conn.Do("TDIGEST.RESET", key))
 }
 
-// Adds one or more samples to a sketch
-func (client *Client) TdAdd(key string, samples map[string]float64) ([]string, error) )  {
+// TdAdd - Adds one or more samples to a sketch
+func (client *Client) TdAdd(key string, samples map[string]float64) ([]string, error) {
 	conn := client.Pool.Get()
 	defer conn.Close()
 	args := redis.Args{key}
@@ -469,43 +469,43 @@ func (client *Client) TdAdd(key string, samples map[string]float64) ([]string, e
 	return redis.Strings(reply, err)
 }
 
-// Merges all of the values from 'from' to 'this' sketch
+// TdMerge - Merges all of the values from 'from' to 'this' sketch
 func (client *Client) TdMerge(toKey string, fromKey string) (string, error) {
 	conn := client.Pool.Get()
 	defer conn.Close()
 	return redis.String(conn.Do("TDIGEST.MERGE", toKey, fromKey))
 }
 
-// Get minimum value from the sketch. Will return DBL_MAX if the sketch is empty
+// TdMin - Get minimum value from the sketch. Will return DBL_MAX if the sketch is empty
 func (client *Client) TdMin(key string) (float64, error) {
 	conn := client.Pool.Get()
 	defer conn.Close()
-	return redis.String(conn.Do("TDIGEST.MIN", key))
+	return redis.Float64(conn.Do("TDIGEST.MIN", key))
 }
 
-// Get maximum value from the sketch. Will return DBL_MIN if the sketch is empty
+// TdMax - Get maximum value from the sketch. Will return DBL_MIN if the sketch is empty
 func (client *Client) TdMax(key string) (float64, error) {
 	conn := client.Pool.Get()
 	defer conn.Close()
-	return redis.String(conn.Do("TDIGEST.MAX", key))
+	return redis.Float64(conn.Do("TDIGEST.MAX", key))
 }
 
-// Returns an estimate of the cutoff such that a specified fraction of the data added 
+// TdQuantile - Returns an estimate of the cutoff such that a specified fraction of the data added
 // to this TDigest would be less than or equal to the cutoff
 func (client *Client) TdQuantile(key string, quantile float64) (float64, error) {
 	conn := client.Pool.Get()
 	defer conn.Close()
-	return redis.String(conn.Do("TDIGEST.QUANTILE", key, quantile))
+	return redis.Float64(conn.Do("TDIGEST.QUANTILE", key, quantile))
 }
 
-// Returns the fraction of all points added which are <= value
+// TdCdf - Returns the fraction of all points added which are <= value
 func (client *Client) TdCdf(key string, value float64) (float64, error) {
 	conn := client.Pool.Get()
 	defer conn.Close()
-	return redis.String(conn.Do("TDIGEST.CDF", key, value))
+	return redis.Float64(conn.Do("TDIGEST.CDF", key, value))
 }
 
-// Returns compression, capacity, total merged and unmerged nodes, the total 
+// TdInfo - Returns compression, capacity, total merged and unmerged nodes, the total
 // compressions made up to date on that key, and merged and unmerged weight.
 func (client *Client) TdInfo(key string) (map[string]int64, error) {
 	conn := client.Pool.Get()
