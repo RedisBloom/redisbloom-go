@@ -16,9 +16,16 @@ checkfmt:
  	bash -c "diff -u <(echo -n) <(gofmt -d .)";\
 	EXIT_CODE=$$?;\
 	if [ "$$EXIT_CODE"  -ne 0 ]; then \
-		echo '$@: Go files must be formatted with gofmt'; \
+		echo '$@: Go files must be formatted with go fmt. Please run `make fmt`'; \
 	fi && \
 	exit $$EXIT_CODE
+
+lint:
+	$(GOGET) github.com/golangci/golangci-lint/cmd/golangci-lint
+	golangci-lint run
+
+fmt:
+	$(GOFMT) ./...
 
 get:
 	$(GOGET) -t -v ./...
