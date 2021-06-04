@@ -18,6 +18,52 @@ type Client struct {
 	Name string
 }
 
+// TDigestInfo is a struct that represents T-Digest properties
+type TDigestInfo struct {
+	compression       int64
+	capacity          int64
+	mergedNodes       int64
+	unmergedNodes     int64
+	mergedWeight      float64
+	unmergedWeight    float64
+	totalCompressions int64
+}
+
+// Compression 
+func (info *TDigestInfo) Compression() int64 {
+    return info.compression
+}
+
+// Capacity
+func (info *TDigestInfo) Capacity() int64 {
+    return info.capacity
+}
+
+// MergedNodes
+func (info *TDigestInfo) MergedNodes() int64 {
+    return info.mergedNodes
+}
+
+// UnmergedNodes
+func (info *TDigestInfo) UnmergedNodes() int64 {
+    return info.unmergedNodes
+}
+
+// MergedWeight
+func (info *TDigestInfo) MergedWeight() float64 {
+    return info.mergedWeight
+}
+
+// UnmergedWeight
+func (info *TDigestInfo) UnmergedWeight() float64 {
+    return info.unmergedWeight
+}
+
+// TotalCompressions
+func (info *TDigestInfo) TotalCompressions() int64 {
+    return info.totalCompressions
+}
+
 // NewClient creates a new client connecting to the redis host, and using the given name as key prefix.
 // Addr can be a single host:port pair, or a comma separated list of host:port,host:port...
 // In the case of multiple hosts we create a multi-pool and select connections at random
@@ -458,7 +504,7 @@ func (client *Client) TdReset(key string) (string, error) {
 }
 
 // TdAdd - Adds one or more samples to a sketch
-func (client *Client) TdAdd(key string, samples map[string]float64) ([]string, error) {
+func (client *Client) TdAdd(key string, samples map[string]float64) (string, error) {
 	conn := client.Pool.Get()
 	defer conn.Close()
 	args := redis.Args{key}
@@ -466,7 +512,7 @@ func (client *Client) TdAdd(key string, samples map[string]float64) ([]string, e
 		args = args.Add(k, v)
 	}
 	reply, err := conn.Do("TDIGEST.ADD", args...)
-	return redis.Strings(reply, err)
+	return redis.String(reply, err)
 }
 
 // TdMerge - Merges all of the values from 'from' to 'this' sketch
@@ -507,10 +553,10 @@ func (client *Client) TdCdf(key string, value float64) (float64, error) {
 
 // TdInfo - Returns compression, capacity, total merged and unmerged nodes, the total
 // compressions made up to date on that key, and merged and unmerged weight.
-func (client *Client) TdInfo(key string) (map[string]int64, error) {
+func (client *Client) TdInfo(key string) (TDigestInfo, error) {
 	conn := client.Pool.Get()
 	defer conn.Close()
-	return ParseInfoReply(redis.Values(conn.Do("TDIGEST.INFO", key)))
+	return ParseTDigestInfo(redis.Values(conn.Do("TDIGEST.INFO", key)))
 }
 
 func ParseInfoReply(values []interface{}, err error) (map[string]int64, error) {
@@ -525,4 +571,39 @@ func ParseInfoReply(values []interface{}, err error) (map[string]int64, error) {
 		m[values[i].(string)] = values[i+1].(int64)
 	}
 	return m, err
+}
+
+func ParseTDigestInfo(result interface{}, err error) (info TDigestInfo, outErr error) {
+	values, outErr := redis.Values(result, err)
+	if outErr != nil {
+		return TDigestInfo{}, err
+	}
+	if len(values)%2 != 0 {
+		return TDigestInfo{}, errors.New("ParseInfo expects even number of values result")
+	}
+	var key string
+	for i := 0; i < len(values); i += 2 {
+		key, outErr = redis.String(values[i], nil)
+		switch key {
+		case "Compression":
+			info.compression, outErr = redis.Int64(values[i+1], nil)
+		case "Capacity":
+			info.capacity, outErr = redis.Int64(values[i+1], nil)
+		case "Merged nodes":
+			info.mergedNodes, outErr = redis.Int64(values[i+1], nil)
+		case "Unmerged nodes":
+			info.unmergedNodes, outErr = redis.Int64(values[i+1], nil)
+		case "Merged weight":
+			info.mergedWeight, outErr = redis.Float64(values[i+1], nil)
+		case "Unmerged weight":
+			info.unmergedWeight, outErr = redis.Float64(values[i+1], nil)
+		case "Total compressions":
+			info.totalCompressions, outErr = redis.Int64(values[i+1], nil)
+		}
+		if outErr != nil {
+			return TDigestInfo{}, outErr
+		}
+	}
+
+	return info, nil
 }
