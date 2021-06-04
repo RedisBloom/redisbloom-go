@@ -29,39 +29,39 @@ type TDigestInfo struct {
 	totalCompressions int64
 }
 
-// Compression 
+// Compression
 func (info *TDigestInfo) Compression() int64 {
-    return info.compression
+	return info.compression
 }
 
 // Capacity
 func (info *TDigestInfo) Capacity() int64 {
-    return info.capacity
+	return info.capacity
 }
 
 // MergedNodes
 func (info *TDigestInfo) MergedNodes() int64 {
-    return info.mergedNodes
+	return info.mergedNodes
 }
 
 // UnmergedNodes
 func (info *TDigestInfo) UnmergedNodes() int64 {
-    return info.unmergedNodes
+	return info.unmergedNodes
 }
 
 // MergedWeight
 func (info *TDigestInfo) MergedWeight() float64 {
-    return info.mergedWeight
+	return info.mergedWeight
 }
 
 // UnmergedWeight
 func (info *TDigestInfo) UnmergedWeight() float64 {
-    return info.unmergedWeight
+	return info.unmergedWeight
 }
 
 // TotalCompressions
 func (info *TDigestInfo) TotalCompressions() int64 {
-    return info.totalCompressions
+	return info.totalCompressions
 }
 
 // NewClient creates a new client connecting to the redis host, and using the given name as key prefix.
