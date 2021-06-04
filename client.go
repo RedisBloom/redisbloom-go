@@ -29,37 +29,37 @@ type TDigestInfo struct {
 	totalCompressions int64
 }
 
-// Compression
+// Compression - returns the compression of TDigestInfo instance
 func (info *TDigestInfo) Compression() int64 {
 	return info.compression
 }
 
-// Capacity
+// Capacity - returns the capacity of TDigestInfo instance
 func (info *TDigestInfo) Capacity() int64 {
 	return info.capacity
 }
 
-// MergedNodes
+// MergedNodes - returns the merged nodes of TDigestInfo instance
 func (info *TDigestInfo) MergedNodes() int64 {
 	return info.mergedNodes
 }
 
-// UnmergedNodes
+// UnmergedNodes -  returns the unmerged nodes of TDigestInfo instance
 func (info *TDigestInfo) UnmergedNodes() int64 {
 	return info.unmergedNodes
 }
 
-// MergedWeight
+// MergedWeight - returns the merged weight of TDigestInfo instance
 func (info *TDigestInfo) MergedWeight() float64 {
 	return info.mergedWeight
 }
 
-// UnmergedWeight
+// UnmergedWeight - returns the unmerged weight of TDigestInfo instance
 func (info *TDigestInfo) UnmergedWeight() float64 {
 	return info.unmergedWeight
 }
 
-// TotalCompressions
+// TotalCompressions - returns the total compressions of TDigestInfo instance
 func (info *TDigestInfo) TotalCompressions() int64 {
 	return info.totalCompressions
 }

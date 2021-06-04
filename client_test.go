@@ -552,6 +552,9 @@ func TestClient_TdReset(t *testing.T) {
 	info, err := client.TdInfo(key)
 	assert.Nil(t, err)
 	assert.Equal(t, 0.0, info.UnmergedWeight())
+	assert.Equal(t, int64(0), info.TotalCompressions())
+	assert.Equal(t, int64(100), info.Compression())
+	assert.Equal(t, int64(610), info.Capacity())
 }
 
 func TestClient_TdMerge(t *testing.T) {
@@ -583,6 +586,8 @@ func TestClient_TdMerge(t *testing.T) {
 	info, err := client.TdInfo(key1)
 	assert.Nil(t, err)
 	assert.Equal(t, 10.0, info.UnmergedWeight()+info.MergedWeight())
+	assert.Equal(t, int64(2), info.UnmergedNodes())
+	assert.Equal(t, int64(2), info.MergedNodes())
 }
 
 func TestClient_TdMinMax(t *testing.T) {
