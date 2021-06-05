@@ -540,7 +540,7 @@ func TestClient_TdReset(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, "OK", ret)
 
-	samples := map[string]float64{"1": 1.0, "2": 2.0}
+	samples := map[float64]float64{1.0: 1.0, 2.0: 2.0}
 	ret, err = client.TdAdd(key, samples)
 	assert.Nil(t, err)
 	assert.Equal(t, "OK", ret)
@@ -568,8 +568,8 @@ func TestClient_TdMerge(t *testing.T) {
 	assert.Equal(t, "OK", ret)
 
 	//Add values
-	samples1 := map[string]float64{"1": 1.0, "2": 2.0}
-	samples2 := map[string]float64{"3": 3.0, "4": 4.0}
+	samples1 := map[float64]float64{1.0: 1.0, 2.0: 2.0}
+	samples2 := map[float64]float64{3.0: 3.0, 4.0: 4.0}
 	ret, err = client.TdAdd(key1, samples1)
 	assert.Nil(t, err)
 	assert.Equal(t, "OK", ret)
@@ -597,7 +597,7 @@ func TestClient_TdMinMax(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, "OK", ret)
 
-	samples := map[string]float64{"1": 1.0, "2": 2.0, "3": 3.0}
+	samples := map[float64]float64{1.0: 1.0, 2.0: 2.0, 3.0: 3.0}
 	ret, err = client.TdAdd(key, samples)
 	assert.Nil(t, err)
 	assert.Equal(t, "OK", ret)
@@ -618,7 +618,7 @@ func TestClient_TdQuantile(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, "OK", ret)
 
-	samples := map[string]float64{"1": 1.0, "2": 1.0, "3": 1.0}
+	samples := map[float64]float64{1.0: 1.0, 2.0: 1.0, 3.0: 1.0}
 	ret, err = client.TdAdd(key, samples)
 	assert.Nil(t, err)
 	assert.Equal(t, "OK", ret)
@@ -639,7 +639,7 @@ func TestClient_TdCdf(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, "OK", ret)
 
-	samples := map[string]float64{"1": 1.0, "2": 1.0, "3": 1.0}
+	samples := map[float64]float64{1.0: 1.0, 2.0: 1.0, 3.0: 1.0}
 	ret, err = client.TdAdd(key, samples)
 	assert.Nil(t, err)
 	assert.Equal(t, "OK", ret)

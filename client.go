@@ -504,7 +504,7 @@ func (client *Client) TdReset(key string) (string, error) {
 }
 
 // TdAdd - Adds one or more samples to a sketch
-func (client *Client) TdAdd(key string, samples map[string]float64) (string, error) {
+func (client *Client) TdAdd(key string, samples map[float64]float64) (string, error) {
 	conn := client.Pool.Get()
 	defer conn.Close()
 	args := redis.Args{key}
