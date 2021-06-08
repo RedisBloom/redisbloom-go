@@ -527,5 +527,128 @@ func TestClient_BfScanDump(t *testing.T) {
 	assert.Nil(t, err)
 	_, _, err = client.BfScanDump(notBfKey, 0)
 	assert.Equal(t, err.Error(), "WRONGTYPE Operation against a key holding the wrong kind of value")
+}
 
+func TestClient_TdReset(t *testing.T) {
+	client.FlushAll()
+	key := "test_td"
+	ret, err := client.TdCreate(key, 100)
+	assert.Nil(t, err)
+	assert.Equal(t, "OK", ret)
+
+	ret, err = client.TdReset(key)
+	assert.Nil(t, err)
+	assert.Equal(t, "OK", ret)
+
+	samples := map[float64]float64{1.0: 1.0, 2.0: 2.0}
+	ret, err = client.TdAdd(key, samples)
+	assert.Nil(t, err)
+	assert.Equal(t, "OK", ret)
+
+	ret, err = client.TdReset(key)
+	assert.Nil(t, err)
+	assert.Equal(t, "OK", ret)
+
+	info, err := client.TdInfo(key)
+	assert.Nil(t, err)
+	assert.Equal(t, 0.0, info.UnmergedWeight())
+	assert.Equal(t, int64(0), info.TotalCompressions())
+	assert.Equal(t, int64(100), info.Compression())
+	assert.Equal(t, int64(610), info.Capacity())
+}
+
+func TestClient_TdMerge(t *testing.T) {
+	key1 := "toKey"
+	key2 := "fromKey"
+	ret, err := client.TdCreate(key1, 10)
+	assert.Nil(t, err)
+	assert.Equal(t, "OK", ret)
+	ret, err = client.TdCreate(key2, 10)
+	assert.Nil(t, err)
+	assert.Equal(t, "OK", ret)
+
+	//Add values
+	samples1 := map[float64]float64{1.0: 1.0, 2.0: 2.0}
+	samples2 := map[float64]float64{3.0: 3.0, 4.0: 4.0}
+	ret, err = client.TdAdd(key1, samples1)
+	assert.Nil(t, err)
+	assert.Equal(t, "OK", ret)
+	ret, err = client.TdAdd(key2, samples2)
+	assert.Nil(t, err)
+	assert.Equal(t, "OK", ret)
+
+	//Merge
+	ret, err = client.TdMerge(key1, key2)
+	assert.Nil(t, err)
+	assert.Equal(t, "OK", ret)
+
+	// we should now have 10 weight on to-histogram
+	info, err := client.TdInfo(key1)
+	assert.Nil(t, err)
+	assert.Equal(t, 10.0, info.UnmergedWeight()+info.MergedWeight())
+	assert.Equal(t, int64(2), info.UnmergedNodes())
+	assert.Equal(t, int64(2), info.MergedNodes())
+}
+
+func TestClient_TdMinMax(t *testing.T) {
+	client.FlushAll()
+	key := "test_td"
+	ret, err := client.TdCreate(key, 10)
+	assert.Nil(t, err)
+	assert.Equal(t, "OK", ret)
+
+	samples := map[float64]float64{1.0: 1.0, 2.0: 2.0, 3.0: 3.0}
+	ret, err = client.TdAdd(key, samples)
+	assert.Nil(t, err)
+	assert.Equal(t, "OK", ret)
+
+	ans, err := client.TdMin(key)
+	assert.Nil(t, err)
+	assert.Equal(t, 1.0, ans)
+
+	ans, err = client.TdMax(key)
+	assert.Nil(t, err)
+	assert.Equal(t, 3.0, ans)
+}
+
+func TestClient_TdQuantile(t *testing.T) {
+	client.FlushAll()
+	key := "test_td"
+	ret, err := client.TdCreate(key, 10)
+	assert.Nil(t, err)
+	assert.Equal(t, "OK", ret)
+
+	samples := map[float64]float64{1.0: 1.0, 2.0: 1.0, 3.0: 1.0}
+	ret, err = client.TdAdd(key, samples)
+	assert.Nil(t, err)
+	assert.Equal(t, "OK", ret)
+
+	ans, err := client.TdQuantile(key, 1.0)
+	assert.Nil(t, err)
+	assert.Equal(t, 3.0, ans)
+
+	ans, err = client.TdQuantile(key, 0.0)
+	assert.Nil(t, err)
+	assert.Equal(t, 1.0, ans)
+}
+
+func TestClient_TdCdf(t *testing.T) {
+	client.FlushAll()
+	key := "test_td"
+	ret, err := client.TdCreate(key, 10)
+	assert.Nil(t, err)
+	assert.Equal(t, "OK", ret)
+
+	samples := map[float64]float64{1.0: 1.0, 2.0: 1.0, 3.0: 1.0}
+	ret, err = client.TdAdd(key, samples)
+	assert.Nil(t, err)
+	assert.Equal(t, "OK", ret)
+
+	ans, err := client.TdCdf(key, 10.0)
+	assert.Nil(t, err)
+	assert.Equal(t, 1.0, ans)
+
+	ans, err = client.TdCdf(key, 0.0)
+	assert.Nil(t, err)
+	assert.Equal(t, 0.0, ans)
 }
