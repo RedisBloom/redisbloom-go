@@ -140,7 +140,7 @@ func ExampleClient_TdMax() {
 	// Output: 3
 }
 
-// exemplifies the TdCdf function
+// exemplifies the TdQuantile function
 func ExampleClient_TdQuantile() {
 	host := "localhost:6379"
 	var client = redisbloom.NewClient(host, "nohelp", nil)
