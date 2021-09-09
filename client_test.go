@@ -227,7 +227,7 @@ func TestClient_TopkQuery(t *testing.T) {
 	keys, err := client.TopkList(key1)
 	assert.Nil(t, err)
 	assert.Equal(t, 3, len(keys))
-	assert.Equal(t, []string{"D", "A", "B"}, keys)
+	assert.Equal(t, []string{"A", "D", "B"}, keys)
 }
 
 func TestClient_TopkInfo(t *testing.T) {
