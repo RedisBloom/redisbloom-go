@@ -276,6 +276,12 @@ func (client *Client) TopkQuery(key string, items []string) ([]int64, error) {
 }
 
 // Return full list of items in Top K list.
+func (client *Client) TopkListWithCount(key string) (map[string]int64, error) {
+	conn := client.Pool.Get()
+	defer conn.Close()
+	return ParseInfoReply(redis.Values(conn.Do("TOPK.LIST", key, "WITHCOUNT")))
+}
+
 func (client *Client) TopkList(key string) ([]string, error) {
 	conn := client.Pool.Get()
 	defer conn.Close()
