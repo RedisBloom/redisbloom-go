@@ -43,7 +43,7 @@ import (
 )
 
 func main() {
-		// Connect to localhost with no password
+    // Connect to localhost with no password
     var client = redisbloom.NewClient("localhost:6379", "nohelp", nil)
        
     // BF.ADD mytest item 
