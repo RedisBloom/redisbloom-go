@@ -17,7 +17,7 @@ jobs:
       - run: make checkfmt
       - run: make get
       - run: make coverage
-      - run: bash <(curl -s https://codecov.io/bash) -t ${CODECOV_TOKEN}
+      - run: bash <(curl -s https://raw.githubusercontent.com/codecov/codecov-bash/master/codecov)
 
 workflows:
   version: 2
