@@ -71,7 +71,7 @@ func TestReserve(t *testing.T) {
 		"Expansion rate":           2,
 		"Number of filters":        1,
 		"Number of items inserted": 0,
-		"Size":                     936,
+		"Size":                     880,
 	})
 
 	err = client.Reserve(key, 0.1, 1000)
