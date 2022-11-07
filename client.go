@@ -6,8 +6,6 @@ import (
 	"strconv"
 	"strings"
 
-	"log"
-
 	"github.com/gomodule/redigo/redis"
 )
 
@@ -640,33 +638,24 @@ func ParseTDigestInfo(result interface{}, err error) (info TDigestInfo, outErr e
 		}
 		switch key {
 		case "Compression":
-			log.Print("COMPRESS")
 			info.compression, outErr = redis.Int64(values[i+1], nil)
 		case "Capacity":
-			log.Print("CAPACITY")
 			info.capacity, outErr = redis.Int64(values[i+1], nil)
 		case "Merged nodes":
-			log.Print("MERGED NODES")
 			info.mergedNodes, outErr = redis.Int64(values[i+1], nil)
 		case "Unmerged nodes":
-			log.Print("UNMERGED NODES")
 			info.unmergedNodes, outErr = redis.Int64(values[i+1], nil)
 		case "Merged weight":
-			log.Print("MERGED WEIGHT")
 			info.mergedWeight, outErr = redis.Float64(values[i+1], nil)
 		case "Unmerged weight":
-			log.Print("UNMERGED WEIGHT")
 			info.unmergedWeight, outErr = redis.Float64(values[i+1], nil)
 		case "Total compressions":
-			log.Print("COMPRESSIONS")
 			info.totalCompressions, outErr = redis.Int64(values[i+1], nil)
 		}
 		if outErr != nil {
 			return TDigestInfo{}, outErr
 		}
 	}
-
-	log.Fatal("OH NO SPORTZFANS")
 
 	return info, nil
 }

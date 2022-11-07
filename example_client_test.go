@@ -2,9 +2,10 @@ package redis_bloom_go_test
 
 import (
 	"fmt"
+	"log"
+
 	redisbloom "github.com/RedisBloom/redisbloom-go"
 	"github.com/gomodule/redigo/redis"
-	"log"
 )
 
 // exemplifies the NewClient function
@@ -55,6 +56,7 @@ func ExampleNewClientFromPool() {
 func ExampleClient_TdCreate() {
 	host := "localhost:6379"
 	var client = redisbloom.NewClient(host, "nohelp", nil)
+	client.FlushAll()
 
 	ret, err := client.TdCreate("key", 100)
 	if err != nil {
@@ -70,6 +72,7 @@ func ExampleClient_TdCreate() {
 func ExampleClient_TdAdd() {
 	host := "localhost:6379"
 	var client = redisbloom.NewClient(host, "nohelp", nil)
+	client.FlushAll()
 
 	key := "example"
 	ret, err := client.TdCreate(key, 100)
@@ -92,6 +95,7 @@ func ExampleClient_TdAdd() {
 func ExampleClient_TdMin() {
 	host := "localhost:6379"
 	var client = redisbloom.NewClient(host, "nohelp", nil)
+	client.FlushAll()
 
 	key := "example"
 	_, err := client.TdCreate(key, 10)
@@ -118,6 +122,7 @@ func ExampleClient_TdMin() {
 func ExampleClient_TdMax() {
 	host := "localhost:6379"
 	var client = redisbloom.NewClient(host, "nohelp", nil)
+	client.FlushAll()
 
 	key := "example"
 	_, err := client.TdCreate(key, 10)
@@ -144,6 +149,7 @@ func ExampleClient_TdMax() {
 func ExampleClient_TdQuantile() {
 	host := "localhost:6379"
 	var client = redisbloom.NewClient(host, "nohelp", nil)
+	client.FlushAll()
 
 	key := "example"
 	_, err := client.TdCreate(key, 10)
@@ -163,13 +169,14 @@ func ExampleClient_TdQuantile() {
 	}
 
 	fmt.Println(ans)
-	// Output: 5
+	// Output: [5]
 }
 
 // exemplifies the TdCdf function
 func ExampleClient_TdCdf() {
 	host := "localhost:6379"
 	var client = redisbloom.NewClient(host, "nohelp", nil)
+	client.FlushAll()
 
 	key := "example"
 	_, err := client.TdCreate(key, 10)
@@ -189,5 +196,5 @@ func ExampleClient_TdCdf() {
 	}
 
 	fmt.Println(cdf)
-	// Output: 0.1
+	// Output: [0.2]
 }
