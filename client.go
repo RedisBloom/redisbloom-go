@@ -555,12 +555,12 @@ func (client *Client) TdMergeWithCompression(toKey string, compression int64, nu
 	return client.tdMerge(toKey, compression, false, numKeys, fromKey...)
 }
 
-// TdMergeWithCompression - Merges all of the values from 'from' to 'this' sketch overriding the destination key if it exists
+// TdMergeWithOverride - Merges all of the values from 'from' to 'this' sketch overriding the destination key if it exists
 func (client *Client) TdMergeWithOverride(toKey string, override bool, numKeys int64, fromKey ...string) (string, error) {
 	return client.tdMerge(toKey, 100, true, numKeys, fromKey...)
 }
 
-// TdMergeWithCompression - Merges all of the values from 'from' to 'this' sketch with specified compression
+// TdMergeWithCompressionAndOverride - Merges all of the values from 'from' to 'this' sketch with specified compression
 // and overriding the destination key if it exists
 func (client *Client) TdMergeWithCompressionAndOverride(toKey string, compression int64, numKeys int64, fromKey ...string) (string, error) {
 	return client.tdMerge(toKey, compression, true, numKeys, fromKey...)
