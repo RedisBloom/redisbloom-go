@@ -3,9 +3,12 @@ package redis_bloom_go
 import (
 	"errors"
 	"fmt"
-	"github.com/gomodule/redigo/redis"
 	"strconv"
 	"strings"
+
+	"log"
+
+	"github.com/gomodule/redigo/redis"
 )
 
 // TODO: refactor this hard limit and revise client locking
@@ -499,7 +502,7 @@ func (client *Client) CfInfo(key string) (map[string]int64, error) {
 func (client *Client) TdCreate(key string, compression int64) (string, error) {
 	conn := client.Pool.Get()
 	defer conn.Close()
-	return redis.String(conn.Do("TDIGEST.CREATE", key, compression))
+	return redis.String(conn.Do("TDIGEST.CREATE", key, "COMPRESSION", compression))
 }
 
 // TdReset - Reset the sketch to zero - empty out the sketch and re-initialize it
@@ -521,11 +524,48 @@ func (client *Client) TdAdd(key string, samples map[float64]float64) (string, er
 	return redis.String(reply, err)
 }
 
-// TdMerge - Merges all of the values from 'from' to 'this' sketch
-func (client *Client) TdMerge(toKey string, fromKey string) (string, error) {
+// tdMerge - The internal representation of TdMerge. All underlying functions call this one,
+// returning its results. It allows us to maintain interfaces.
+// see https://redis.io/commands/tdigest.merge/
+//
+// The default values for compression is 100
+func (client *Client) tdMerge(toKey string, compression int64, override bool, numKeys int64, fromKey ...string) (string, error) {
+	if numKeys < 1 {
+		return "", errors.New("a minimum of one key must be merged")
+	}
+
 	conn := client.Pool.Get()
 	defer conn.Close()
-	return redis.String(conn.Do("TDIGEST.MERGE", toKey, fromKey))
+	overidable := ""
+	if override {
+		overidable = "1"
+	}
+	return redis.String(conn.Do("TDIGEST.MERGE", toKey,
+		strconv.FormatInt(numKeys, 10),
+		strings.Join(fromKey, " "),
+		"COMPRESSION", compression,
+		overidable))
+}
+
+// TdMerge - Merges all of the values from 'from' to 'this' sketch
+func (client *Client) TdMerge(toKey string, numKeys int64, fromKey ...string) (string, error) {
+	return client.tdMerge(toKey, 100, false, numKeys, fromKey...)
+}
+
+// TdMergeWithCompression - Merges all of the values from 'from' to 'this' sketch with specified compression
+func (client *Client) TdMergeWithCompression(toKey string, compression int64, numKeys int64, fromKey ...string) (string, error) {
+	return client.tdMerge(toKey, compression, false, numKeys, fromKey...)
+}
+
+// TdMergeWithCompression - Merges all of the values from 'from' to 'this' sketch overriding the destination key if it exists
+func (client *Client) TdMergeWithOverride(toKey string, override bool, numKeys int64, fromKey ...string) (string, error) {
+	return client.tdMerge(toKey, 100, true, numKeys, fromKey...)
+}
+
+// TdMergeWithCompression - Merges all of the values from 'from' to 'this' sketch with specified compression
+// and overriding the destination key if it exists
+func (client *Client) TdMergeWithCompressionAndOverride(toKey string, compression int64, numKeys int64, fromKey ...string) (string, error) {
+	return client.tdMerge(toKey, compression, true, numKeys, fromKey...)
 }
 
 // TdMin - Get minimum value from the sketch. Will return DBL_MAX if the sketch is empty
@@ -544,17 +584,22 @@ func (client *Client) TdMax(key string) (float64, error) {
 
 // TdQuantile - Returns an estimate of the cutoff such that a specified fraction of the data added
 // to this TDigest would be less than or equal to the cutoff
-func (client *Client) TdQuantile(key string, quantile float64) (float64, error) {
+func (client *Client) TdQuantile(key string, quantile float64) ([]float64, error) {
 	conn := client.Pool.Get()
 	defer conn.Close()
-	return redis.Float64(conn.Do("TDIGEST.QUANTILE", key, quantile))
+	return redis.Float64s(conn.Do("TDIGEST.QUANTILE", key, quantile))
 }
 
-// TdCdf - Returns the fraction of all points added which are <= value
-func (client *Client) TdCdf(key string, value float64) (float64, error) {
+// TdCdf - Returns the list of fractions of all points added which are <= values
+func (client *Client) TdCdf(key string, values ...float64) ([]float64, error) {
 	conn := client.Pool.Get()
 	defer conn.Close()
-	return redis.Float64(conn.Do("TDIGEST.CDF", key, value))
+
+	args := make([]string, len(values))
+	for idx, obj := range values {
+		args[idx] = strconv.FormatFloat(obj, 'f', -1, 64)
+	}
+	return redis.Float64s(conn.Do("TDIGEST.CDF", key, strings.Join(args, " ")))
 }
 
 // TdInfo - Returns compression, capacity, total merged and unmerged nodes, the total
@@ -590,26 +635,38 @@ func ParseTDigestInfo(result interface{}, err error) (info TDigestInfo, outErr e
 	var key string
 	for i := 0; i < len(values); i += 2 {
 		key, outErr = redis.String(values[i], nil)
+		if outErr != nil {
+			return TDigestInfo{}, outErr
+		}
 		switch key {
 		case "Compression":
+			log.Print("COMPRESS")
 			info.compression, outErr = redis.Int64(values[i+1], nil)
 		case "Capacity":
+			log.Print("CAPACITY")
 			info.capacity, outErr = redis.Int64(values[i+1], nil)
 		case "Merged nodes":
+			log.Print("MERGED NODES")
 			info.mergedNodes, outErr = redis.Int64(values[i+1], nil)
 		case "Unmerged nodes":
+			log.Print("UNMERGED NODES")
 			info.unmergedNodes, outErr = redis.Int64(values[i+1], nil)
 		case "Merged weight":
+			log.Print("MERGED WEIGHT")
 			info.mergedWeight, outErr = redis.Float64(values[i+1], nil)
 		case "Unmerged weight":
+			log.Print("UNMERGED WEIGHT")
 			info.unmergedWeight, outErr = redis.Float64(values[i+1], nil)
 		case "Total compressions":
+			log.Print("COMPRESSIONS")
 			info.totalCompressions, outErr = redis.Int64(values[i+1], nil)
 		}
 		if outErr != nil {
 			return TDigestInfo{}, outErr
 		}
 	}
+
+	log.Fatal("OH NO SPORTZFANS")
 
 	return info, nil
 }
