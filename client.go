@@ -25,8 +25,8 @@ type TDigestInfo struct {
 	capacity          int64
 	mergedNodes       int64
 	unmergedNodes     int64
-	mergedWeight      float64
-	unmergedWeight    float64
+	mergedWeight      int64
+	unmergedWeight    int64
 	totalCompressions int64
 }
 
@@ -51,12 +51,12 @@ func (info *TDigestInfo) UnmergedNodes() int64 {
 }
 
 // MergedWeight - returns the merged weight of TDigestInfo instance
-func (info *TDigestInfo) MergedWeight() float64 {
+func (info *TDigestInfo) MergedWeight() int64 {
 	return info.mergedWeight
 }
 
 // UnmergedWeight - returns the unmerged weight of TDigestInfo instance
-func (info *TDigestInfo) UnmergedWeight() float64 {
+func (info *TDigestInfo) UnmergedWeight() int64 {
 	return info.unmergedWeight
 }
 
@@ -646,9 +646,9 @@ func ParseTDigestInfo(result interface{}, err error) (info TDigestInfo, outErr e
 		case "Unmerged nodes":
 			info.unmergedNodes, outErr = redis.Int64(values[i+1], nil)
 		case "Merged weight":
-			info.mergedWeight, outErr = redis.Float64(values[i+1], nil)
+			info.mergedWeight, outErr = redis.Int64(values[i+1], nil)
 		case "Unmerged weight":
-			info.unmergedWeight, outErr = redis.Float64(values[i+1], nil)
+			info.unmergedWeight, outErr = redis.Int64(values[i+1], nil)
 		case "Total compressions":
 			info.totalCompressions, outErr = redis.Int64(values[i+1], nil)
 		}

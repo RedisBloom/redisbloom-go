@@ -585,11 +585,11 @@ func TestClient_TdMerge(t *testing.T) {
 
 	// TODO <open question, do we need this>
 	// we should now have 10 weight on to-histogram
-	// _, err = client.TdInfo(key1)
-	// assert.Nil(t, err)
-	// assert.Equal(t, float64(0), info.UnmergedWeight()+info.MergedWeight())
-	// assert.Equal(t, float64(0), info.UnmergedNodes())
-	// assert.Equal(t, int64(0), info.MergedNodes())
+	info, err := client.TdInfo(key1)
+	assert.Nil(t, err)
+	assert.Equal(t, int64(8), info.UnmergedWeight()+info.MergedWeight())
+	assert.Equal(t, int64(4), info.UnmergedNodes())
+	assert.Equal(t, int64(4), info.MergedNodes())
 }
 
 func TestClient_TdMinMax(t *testing.T) {
