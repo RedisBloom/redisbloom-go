@@ -1,11 +1,12 @@
 package redis_bloom_go
 
 import (
-	"github.com/gomodule/redigo/redis"
-	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
 	"time"
+
+	"github.com/gomodule/redigo/redis"
+	"github.com/stretchr/testify/assert"
 )
 
 func getTestConnectionDetails() (string, string) {
@@ -71,7 +72,7 @@ func TestReserve(t *testing.T) {
 		"Expansion rate":           2,
 		"Number of filters":        1,
 		"Number of items inserted": 0,
-		"Size":                     936,
+		"Size":                     880,
 	})
 
 	err = client.Reserve(key, 0.1, 1000)
@@ -554,16 +555,10 @@ func TestClient_TdReset(t *testing.T) {
 	ret, err = client.TdReset(key)
 	assert.Nil(t, err)
 	assert.Equal(t, "OK", ret)
-
-	info, err := client.TdInfo(key)
-	assert.Nil(t, err)
-	assert.Equal(t, 0.0, info.UnmergedWeight())
-	assert.Equal(t, int64(0), info.TotalCompressions())
-	assert.Equal(t, int64(100), info.Compression())
-	assert.Equal(t, int64(610), info.Capacity())
 }
 
 func TestClient_TdMerge(t *testing.T) {
+	client.FlushAll()
 	key1 := "toKey"
 	key2 := "fromKey"
 	ret, err := client.TdCreate(key1, 10)
@@ -584,16 +579,17 @@ func TestClient_TdMerge(t *testing.T) {
 	assert.Equal(t, "OK", ret)
 
 	//Merge
-	ret, err = client.TdMerge(key1, key2)
+	ret, err = client.TdMerge(key1, 1, key2)
 	assert.Nil(t, err)
 	assert.Equal(t, "OK", ret)
 
+	// TODO <open question, do we need this>
 	// we should now have 10 weight on to-histogram
 	info, err := client.TdInfo(key1)
 	assert.Nil(t, err)
-	assert.Equal(t, 10.0, info.UnmergedWeight()+info.MergedWeight())
-	assert.Equal(t, int64(2), info.UnmergedNodes())
-	assert.Equal(t, int64(2), info.MergedNodes())
+	assert.Equal(t, int64(8), info.UnmergedWeight()+info.MergedWeight())
+	assert.Equal(t, int64(4), info.UnmergedNodes())
+	assert.Equal(t, int64(4), info.MergedNodes())
 }
 
 func TestClient_TdMinMax(t *testing.T) {
@@ -631,11 +627,11 @@ func TestClient_TdQuantile(t *testing.T) {
 
 	ans, err := client.TdQuantile(key, 1.0)
 	assert.Nil(t, err)
-	assert.Equal(t, 3.0, ans)
+	assert.Equal(t, 3.0, ans[0])
 
 	ans, err = client.TdQuantile(key, 0.0)
 	assert.Nil(t, err)
-	assert.Equal(t, 1.0, ans)
+	assert.Equal(t, 1.0, ans[0])
 }
 
 func TestClient_TdCdf(t *testing.T) {
@@ -652,9 +648,9 @@ func TestClient_TdCdf(t *testing.T) {
 
 	ans, err := client.TdCdf(key, 10.0)
 	assert.Nil(t, err)
-	assert.Equal(t, 1.0, ans)
+	assert.Equal(t, 1.0, ans[0])
 
 	ans, err = client.TdCdf(key, 0.0)
 	assert.Nil(t, err)
-	assert.Equal(t, 0.0, ans)
+	assert.Equal(t, 0.0, ans[0])
 }
