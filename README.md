@@ -27,7 +27,7 @@ $ go test
 
 The tests expect a Redis server with the RedisBloom module loaded to be available at localhost:6379. You can easily launch RedisBloom with Docker in the following manner:
 ```
-docker run -d -p 6379:6379 --name redis-redisbloom redislabs/rebloom:latest 
+docker run -d -p 6379:6379 --name redis-redisbloom redis/redis-stack-server:latest
 ```
 
 ## Example Code
@@ -35,7 +35,7 @@ docker run -d -p 6379:6379 --name redis-redisbloom redislabs/rebloom:latest
 Make sure to check the full list of examples at [Pkg.go.dev](https://pkg.go.dev/github.com/RedisBloom/redisbloom-go#pkg-examples).
 
 ```go
-package main 
+package main
 
 import (
         "fmt"
@@ -45,13 +45,13 @@ import (
 func main() {
     // Connect to localhost with no password
     var client = redisbloom.NewClient("localhost:6379", "nohelp", nil)
-       
-    // BF.ADD mytest item 
+
+    // BF.ADD mytest item
     _, err := client.Add("mytest", "myItem")
     if err != nil {
         fmt.Println("Error:", err)
     }
-    
+
     exists, err := client.Exists("mytest", "myItem")
     if err != nil {
         fmt.Println("Error:", err)
