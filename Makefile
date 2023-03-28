@@ -20,10 +20,6 @@ checkfmt:
 	fi && \
 	exit $$EXIT_CODE
 
-lint:
-	$(GOGET) github.com/golangci/golangci-lint/cmd/golangci-lint
-	golangci-lint run
-
 fmt:
 	$(GOFMT) ./...
 
@@ -36,4 +32,3 @@ test: get
 
 coverage: get test
 	$(GOTEST) -race -coverprofile=coverage.txt -covermode=atomic .
-
