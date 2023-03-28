@@ -116,6 +116,20 @@ func TestClient_BfAddMulti(t *testing.T) {
 	assert.NotNil(t, ret)
 }
 
+func TestClient_BfCard(t *testing.T) {
+	keyname := "bfcardkey"
+	client.FlushAll()
+	res, err := client.BfCard(keyname)
+	assert.Nil(t, err)
+	assert.Equal(t, res, int64(0))
+
+	client.FlushAll()
+	client.BfAddMulti(keyname, []string{"a", "b", "c"})
+	res, err = client.BfCard(keyname)
+	assert.Nil(t, err)
+	assert.Equal(t, res, int64(3))
+}
+
 func TestClient_BfExistsMulti(t *testing.T) {
 	client.FlushAll()
 	key := "test_exists_multi"

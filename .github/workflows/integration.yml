@@ -31,7 +31,7 @@ jobs:
 
   integration:
     services:
-      image: redislabs/rebloom:edge
+      image: redis/redis-stack-server:latest
       port:
         - 6379:6379
     name: Build and test
