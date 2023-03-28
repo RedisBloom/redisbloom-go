@@ -10,13 +10,13 @@ on:
       - master
       - main
       - '[0-9].[0-9]'
-    pull_request:
-      branches:
-        - master
-        - main
-        - '[0-9].[0-9]'
-    schedule:
-      - cron: '0 1 * * *'
+  pull_request:
+    branches:
+      - master
+      - main
+      - '[0-9].[0-9]'
+  schedule:
+    - cron: '0 1 * * *'
 
 jobs:
 
@@ -30,10 +30,6 @@ jobs:
           make lint
 
   integration:
-    services:
-      image: redis/redis-stack-server:latest
-      port:
-        - 6379:6379
     name: Build and test
     runs-on: ubuntu-latest
     steps:
@@ -41,6 +37,7 @@ jobs:
         with:
           go-version: 1.18.x
       - uses: actions/checkout@v3
+      - run: docker run -p 6379:6379 -d redis/redis-stack-server:edge
       - run: |
           make get
           make coverage
