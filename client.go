@@ -169,6 +169,14 @@ func (client *Client) BfAddMulti(key string, items []string) ([]int64, error) {
 	return redis.Int64s(result, err)
 }
 
+func (client *Client) BfCard(key string) (int64, error) {
+	conn := client.Pool.Get()
+	defer conn.Close()
+	args := redis.Args{key}
+	result, err := conn.Do("BF.CARD", args...)
+	return redis.Int64(result, err)
+}
+
 // BfExistsMulti - Determines if one or more items may exist in the filter or not.
 // args:
 // key - the name of the filter
